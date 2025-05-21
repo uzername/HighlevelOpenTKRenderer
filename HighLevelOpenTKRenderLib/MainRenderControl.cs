@@ -13,9 +13,11 @@ namespace HighLevelOpenTKRenderLib
 {
     public partial class MainRenderControl : UserControl
     {
+        public Scene CurrentScene;
         public MainRenderControl()
         {
             InitializeComponent();
+            CurrentScene = new Scene();
             // Hook up event handlers
             glControlMain.Paint += glControlMain_Paint;
             glControlMain.Resize += glControlMain_Resize;
@@ -30,7 +32,7 @@ namespace HighLevelOpenTKRenderLib
             glControlMain.MakeCurrent();
 
             // Basic OpenGL setup
-            GL.ClearColor(0.3f, 0.3f, 0.5f, 1.0f);
+            GL.ClearColor(CurrentScene.color1.R, CurrentScene.color1.G, CurrentScene.color1.B, CurrentScene.color1.A);
             GL.Enable(EnableCap.DepthTest);
         }
 
