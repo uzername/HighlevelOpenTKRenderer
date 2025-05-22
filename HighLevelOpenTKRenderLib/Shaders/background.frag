@@ -1,11 +1,12 @@
 ﻿#version 330 core
-out vec4 FragColor;
-in float vUV;
 
-uniform vec4 color1; // top
-uniform vec4 color2; // bottom
+in float vUV;
+out vec4 FragColor;
+
+uniform vec4 color1;
+uniform vec4 color2;
 
 void main()
 {
-    FragColor = mix(color2, color1, vUV); // Blend vertically
+    FragColor = mix(color2, color1, vUV);
 }

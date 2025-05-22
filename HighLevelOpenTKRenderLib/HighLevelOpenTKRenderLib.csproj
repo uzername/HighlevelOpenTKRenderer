@@ -8,7 +8,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Shaders\background.frag" />
+    <None Remove="Shaders\background.vert" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Shaders\background.vert" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="OpenTK.GLControl" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Shaders\background.frag" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

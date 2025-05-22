@@ -1,19 +1,28 @@
-﻿using System;
+﻿using HighLevelOpenTKRenderLib.Common;
+using OpenTK.Graphics.OpenGL4;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using OpenTK.Graphics.OpenGL4;
 
 namespace HighLevelOpenTKRenderLib
 {
     public partial class MainRenderControl : UserControl
     {
         public Scene CurrentScene;
+
+        private Shader backgroundShader;
+        private int vaoBackground;
+
         public MainRenderControl()
         {
             InitializeComponent();
@@ -26,14 +35,25 @@ namespace HighLevelOpenTKRenderLib
             // Set up continuous rendering
             Application.Idle += Application_Idle;
         }
-
+        private bool initialized = false;
         private void glControlMain_Load(object sender, EventArgs e)
         {
+            if (initialized) return;
             glControlMain.MakeCurrent();
 
-            // Basic OpenGL setup
-            GL.ClearColor(CurrentScene.color1.R, CurrentScene.color1.G, CurrentScene.color1.B, CurrentScene.color1.A);
-            GL.Enable(EnableCap.DepthTest);
+            // https://stackoverflow.com/a/35780405
+            // You can't read Resource Files with File.ReadAllText.
+            // Instead you need to open a Resource Stream with Assembly.GetManifestResourceStream.
+            
+            using (var streamvert = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.background.vert"))
+            using (var streamfrag = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.background.frag"))
+            {
+                TextReader textReadVert = new StreamReader(streamvert);
+                TextReader textReadFrag = new StreamReader(streamfrag);
+                backgroundShader = new Shader(textReadVert, textReadFrag);
+            }
+            vaoBackground = GL.GenVertexArray();
+            initialized = true;
         }
 
         private void glControlMain_Resize(object sender, EventArgs e)
@@ -68,6 +88,18 @@ namespace HighLevelOpenTKRenderLib
 
             // Clear screen
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.Disable(EnableCap.DepthTest); // Avoid depth interference
+
+            backgroundShader.Use();
+            GL.BindVertexArray(vaoBackground);
+
+            // Set colors from scene
+            GL.Uniform4(GL.GetUniformLocation(backgroundShader.Handle, "color1"), CurrentScene.color1);
+            GL.Uniform4(GL.GetUniformLocation(backgroundShader.Handle, "color2"), CurrentScene.color2);
+            // Draw fullscreen background
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            GL.Enable(EnableCap.DepthTest); // Re-enable for 3D scene
 
             // TODO: Draw your scene here
 
