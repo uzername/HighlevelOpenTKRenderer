@@ -239,5 +239,10 @@ namespace HighLevelOpenTKRenderLib.Common
             GL.UseProgram(Handle);
             GL.Uniform3(_uniformLocations[name], data);
         }
+
+        internal int GetUniformLocation(string v)
+        {
+            return GL.GetUniformLocation(Handle, v);
+        }
     }
 }

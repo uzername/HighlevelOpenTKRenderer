@@ -13,6 +13,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace HighLevelOpenTKRenderLib
 {
@@ -21,12 +23,13 @@ namespace HighLevelOpenTKRenderLib
         public Scene CurrentScene;
 
         private Shader backgroundShader;
+        private Shader simpleobjectShader;
         private int vaoBackground;
 
         public MainRenderControl()
         {
             InitializeComponent();
-            CurrentScene = new Scene();
+            
             // Hook up event handlers
             glControlMain.Paint += glControlMain_Paint;
             glControlMain.Resize += glControlMain_Resize;
@@ -44,7 +47,7 @@ namespace HighLevelOpenTKRenderLib
             // https://stackoverflow.com/a/35780405
             // You can't read Resource Files with File.ReadAllText.
             // Instead you need to open a Resource Stream with Assembly.GetManifestResourceStream.
-            
+            //== setup background ==
             using (var streamvert = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.background.vert"))
             using (var streamfrag = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.background.frag"))
             {
@@ -53,6 +56,15 @@ namespace HighLevelOpenTKRenderLib
                 backgroundShader = new Shader(textReadVert, textReadFrag);
             }
             vaoBackground = GL.GenVertexArray();
+            //== setup camera and simple shader ==
+            using (var streambasicvert = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.basic.vert"))
+            using (var streambasicfrag = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.basic.frag"))
+            {
+                TextReader textReadVert = new StreamReader(streambasicvert);
+                TextReader textReadFrag = new StreamReader(streambasicfrag);
+                simpleobjectShader = new Shader(textReadVert, textReadFrag);
+            }
+            CurrentScene = new Scene();
             initialized = true;
         }
 
@@ -101,8 +113,19 @@ namespace HighLevelOpenTKRenderLib
             GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
             GL.Enable(EnableCap.DepthTest); // Re-enable for 3D scene
 
-            // TODO: Draw your scene here
+            //  Draw your scene here
+            simpleobjectShader.Use(); // however your Shader class binds the program
 
+            // Setup uniforms
+            var view =  CurrentScene.camera.GetViewMatrix();
+            var projection = CurrentScene.camera.GetProjectionMatrix();
+            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("model"), false, ref CurrentScene.object3D.Transform);
+            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("view"), false, ref view);
+            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false,  ref projection);
+
+            GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
+
+            CurrentScene.object3D.Draw();
             glControlMain.SwapBuffers();
         }
 
