@@ -35,7 +35,7 @@ namespace HighLevelOpenTKRenderLib
         public void MoveTo(float X, float Y, float Z)
         {
             // Extract current translation vector to isolate rotation/scale
-            Vector3 newPosition = new Vector3(x, y, z);
+            Vector3 newPosition = new Vector3(X, Y, Z);
 
             // Keep rotation and scale
             Vector3 right = new Vector3(Transform.M11, Transform.M12, Transform.M13);
