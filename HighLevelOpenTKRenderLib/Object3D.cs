@@ -16,12 +16,43 @@ namespace HighLevelOpenTKRenderLib
         {
 
         }
+        /// <summary>
+        /// translate object3d by offsets
+        /// </summary>
+        /// <param name="X">x offset</param>
+        /// <param name="Y">y offset</param>
+        /// <param name="Z">z offset</param>
+        public void MoveBy(float X, float Y, float Z, bool useLocalAxis=false)  {
+            var translation = Matrix4.CreateTranslation(X, Y, Z);
+            if (useLocalAxis==false)
+            { // move in world
+                Transform = Transform * translation;
+            } else
+            { // move locally
+                Transform = translation * Transform;
+            }
+        }
+        public void MoveTo(float X, float Y, float Z)
+        {
+            // Extract current translation vector to isolate rotation/scale
+            Vector3 newPosition = new Vector3(x, y, z);
+
+            // Keep rotation and scale
+            Vector3 right = new Vector3(Transform.M11, Transform.M12, Transform.M13);
+            Vector3 up = new Vector3(Transform.M21, Transform.M22, Transform.M23);
+            Vector3 forward = new Vector3(Transform.M31, Transform.M32, Transform.M33);
+
+            Transform = new Matrix4(
+                new Vector4(right, 0),
+                new Vector4(up, 0),
+                new Vector4(forward, 0),
+                new Vector4(newPosition, 1)
+            );
+        }
     }
 
     public class SimpleObject3D: Object3D
     {
-        
-        
 
         public SimpleObject3D(float[] vertices, uint[] indices)
         {
