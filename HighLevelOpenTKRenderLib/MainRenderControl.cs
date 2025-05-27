@@ -29,7 +29,7 @@ namespace HighLevelOpenTKRenderLib
         public MainRenderControl()
         {
             InitializeComponent();
-            
+
             // Hook up event handlers
             glControlMain.Paint += glControlMain_Paint;
             glControlMain.Resize += glControlMain_Resize;
@@ -65,15 +65,32 @@ namespace HighLevelOpenTKRenderLib
                 simpleobjectShader = new Shader(textReadVert, textReadFrag);
             }
             CurrentScene = new Scene();
+
+            glControlMain.TabStop = true;
+            glControlMain.Focus();
+            this.ParentForm.Shown += (s, e) =>
+            {
+                glControlMain.Focus();
+            };
+
             initialized = true;
         }
 
         private void glControlMain_Resize(object sender, EventArgs e)
         {
+            if ((glControlMain.ClientSize.Height == 0)||(CurrentScene==null)) return; // avoid division by zero
             if (!glControlMain.Context.IsCurrent)
                 glControlMain.MakeCurrent();
 
             GL.Viewport(0, 0, glControlMain.Width, glControlMain.Height);
+            // Update aspect ratio in camera
+            if (CurrentScene.camera is CameraMk2 cam) // replace with your camera type if needed
+            {
+                float aspectRatio = (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height;
+                cam.AspectRatio = aspectRatio;
+            }
+
+            glControlMain.Invalidate(); // optionally force redraw
         }
 
         private void glControlMain_Paint(object sender, PaintEventArgs e)
@@ -114,14 +131,14 @@ namespace HighLevelOpenTKRenderLib
             GL.Enable(EnableCap.DepthTest); // Re-enable for 3D scene
 
             //  Draw your scene here
-            simpleobjectShader.Use(); // however your Shader class binds the program
+            simpleobjectShader.Use();
 
             // Setup uniforms
-            var view =  CurrentScene.camera.GetViewMatrix();
+            var view = CurrentScene.camera.GetViewMatrix();
             var projection = CurrentScene.camera.GetProjectionMatrix();
             GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("model"), false, ref CurrentScene.object3D.Transform);
             GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("view"), false, ref view);
-            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false,  ref projection);
+            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
 
             GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
 
@@ -129,5 +146,37 @@ namespace HighLevelOpenTKRenderLib
             glControlMain.SwapBuffers();
         }
 
+        private void glControlMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)  {
+                case Keys.W: { // forward
+                    CurrentScene.camera.MoveForward();
+                    break;
+                }
+                case Keys.S: { // backwards
+                    CurrentScene.camera.MoveBackward();
+                    break;
+                }
+                case Keys.A: { // left
+                    CurrentScene.camera.MoveLeft();
+                    break;
+                }
+                case Keys.D: { //right
+                    CurrentScene.camera.MoveRight();
+                    break;
+                }
+                case Keys.Space: { // up
+                    CurrentScene.camera.MoveUp();
+                    break;
+                }
+                case Keys.ShiftKey: { // down
+                    CurrentScene.camera.MoveDown();
+                    break;
+                }
+                default: break;
+            }
+            
+
+        }
     }
 }

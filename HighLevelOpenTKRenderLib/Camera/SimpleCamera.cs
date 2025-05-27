@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace HighLevelOpenTKRenderLib
 {
+    /// <summary>
+    /// really basic camera code, good for testing
+    /// </summary>
     public class SimpleCamera  {
         public Vector3 Position = new Vector3(0, 0, 5);
         public Vector3 Target = Vector3.Zero;

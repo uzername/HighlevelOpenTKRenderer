@@ -44,6 +44,7 @@
             glControlMain.SharedContext = null;
             glControlMain.Size = new Size(555, 391);
             glControlMain.TabIndex = 0;
+            glControlMain.KeyDown += glControlMain_KeyDown;
             // 
             // MainRenderControl
             // 
