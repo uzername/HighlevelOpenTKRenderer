@@ -31,20 +31,31 @@ namespace HighLevelOpenTKRenderLib
         /// create camera with initial position and aspect ratio and field of view
         /// </summary>
         /// <param name="position"></param>
-        /// <param name="aspectRatio">best value is 1</param>
-        /// <param name="fieldOfView">angle field of view in radians. Best value is MathHelper.DegreesToRadians(60)</param>
+        /// <param name="aspectRatio">best value is 1, but it is calculated from dimensions of control</param>
+        /// <param name="fieldOfView">angle field of view in DEGREES, it will be converted later. Best value is 60</param>
         public CameraMk2(Vector3 position, float aspectRatio, float fieldOfView)
         {
             Position = position;
+            Fov = fieldOfView;
             AspectRatio = aspectRatio;
-            _fov = fieldOfView;
+            
         }
         
         // The position of the camera
         public Vector3 Position { get; set; }
-
+        private float _aspectRatio;
+        private Matrix4 _projectionMatrix;
         // This is simply the aspect ratio of the viewport, used for the projection matrix.
-        public float AspectRatio { private get; set; }
+        //old aspect ratio declaration: public float AspectRatio { private get; set; }
+        public float AspectRatio
+        {
+            get => _aspectRatio;
+            set
+            {
+                _aspectRatio = value;
+                UpdateProjectionMatrix();
+            }
+        }
 
         public Vector3 Front => _front;
 
@@ -52,6 +63,8 @@ namespace HighLevelOpenTKRenderLib
 
         public Vector3 Right => _right;
 
+        public float NearPlane = 0.01f;
+        public float FarPlane = 100f;
         // We convert from degrees to radians as soon as the property is set to improve performance.
         public float Pitch
         {
@@ -79,8 +92,6 @@ namespace HighLevelOpenTKRenderLib
         }
 
         // The field of view (FOV) is the vertical angle of the camera view.
-        // This has been discussed more in depth in a previous tutorial,
-        // but in this tutorial, you have also learned how we can use this to simulate a zoom feature.
         // We convert from degrees to radians as soon as the property is set to improve performance.
         public float Fov
         {
@@ -97,11 +108,20 @@ namespace HighLevelOpenTKRenderLib
         {
             return Matrix4.LookAt(Position, Position + _front, _up);
         }
-
+        private void UpdateProjectionMatrix()
+        {
+            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(Fov),
+                _aspectRatio,
+                NearPlane,
+                FarPlane
+            );
+        }
         // Get the projection matrix using the same method we have used up until this point
         public Matrix4 GetProjectionMatrix()
         {
-            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
+            //return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, NearPlane, FarPlane);
+            return _projectionMatrix;
         }
 
         // This function is going to update the direction vertices using some of the math learned in the web tutorials.

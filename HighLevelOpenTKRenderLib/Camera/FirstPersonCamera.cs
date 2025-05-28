@@ -1,4 +1,5 @@
 ﻿using HighLevelOpenTKRenderLib;
+using Microsoft.VisualBasic.Devices;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,10 @@ namespace HighLevelOpenTKRenderLib
     public class FirstPersonCamera: CameraMk2, ICameraControl
     {
         public float cameraSpeed = 0.15f;
-        public float sensitivity = 0.02f;
+        public float sensitivity = 0.08f;
+        
+        public bool firstMove = true;
+        private Vector2 _lastPos;
 
         public FirstPersonCamera(Vector3 position, float aspectRatio, float fieldOfView) : base(position, aspectRatio, fieldOfView)
         {
@@ -47,9 +51,24 @@ namespace HighLevelOpenTKRenderLib
             this.Position += this.Up * cameraSpeed;
         }
 
-        public void ProcessMouseInputLook(int cX, int cY)
+        public void ProcessMouseInputLook(int mouseX, int mouseY)
         {
-            throw new NotImplementedException();
+            if (firstMove) // This bool variable is initially set to true.
+            {
+                _lastPos = new Vector2(mouseX, mouseY);
+                firstMove = false;
+            }
+            else
+            {
+                // Calculate the offset of the mouse position
+                var deltaX = mouseX - _lastPos.X;
+                var deltaY = mouseY - _lastPos.Y;
+                _lastPos = new Vector2(mouseX, mouseY);
+
+                // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
+                this.Yaw += deltaX * sensitivity;
+                this.Pitch -= deltaY * sensitivity; // Reversed since y-coordinates range from bottom to top
+            }
         }
     }
 }

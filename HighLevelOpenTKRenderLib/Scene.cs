@@ -19,7 +19,7 @@ namespace HighLevelOpenTKRenderLib
             SceneLights = new List<Light>();
             SceneObjects = new List<Object3D>();
             */
-            camera = new FirstPersonCamera(new Vector3(0, 0, 5), 1, MathHelper.DegreesToRadians(60));
+            
             uint[] testcubeIndices = new uint[]   {
             0, 1, 5,  5, 1, 6,
             1, 2, 6,  6, 2, 7,
@@ -45,7 +45,7 @@ namespace HighLevelOpenTKRenderLib
                     1, 1, 1, 
             };
             object3D = new SimpleObject3D(testcubeVertices, testcubeIndices);
-            object3D.MoveTo(1, 1, 1);
+            object3D.MoveTo(0, 0, -3);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HighLevelOpenTKRenderLib.Common;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -65,6 +66,7 @@ namespace HighLevelOpenTKRenderLib
                 simpleobjectShader = new Shader(textReadVert, textReadFrag);
             }
             CurrentScene = new Scene();
+            CurrentScene.camera = new FirstPersonCamera(new Vector3(0, 0, 5), (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
 
             glControlMain.TabStop = true;
             glControlMain.Focus();
@@ -72,19 +74,19 @@ namespace HighLevelOpenTKRenderLib
             {
                 glControlMain.Focus();
             };
-
+            glControlMain_Resize(this, null);
             initialized = true;
         }
 
         private void glControlMain_Resize(object sender, EventArgs e)
         {
-            if ((glControlMain.ClientSize.Height == 0)||(CurrentScene==null)) return; // avoid division by zero
+            if ((glControlMain.ClientSize.Height == 0) || (CurrentScene == null)) return; // avoid division by zero
             if (!glControlMain.Context.IsCurrent)
                 glControlMain.MakeCurrent();
 
             GL.Viewport(0, 0, glControlMain.Width, glControlMain.Height);
             // Update aspect ratio in camera
-            if (CurrentScene.camera is CameraMk2 cam) // replace with your camera type if needed
+            if (CurrentScene.camera is CameraMk2 cam)
             {
                 float aspectRatio = (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height;
                 cam.AspectRatio = aspectRatio;
@@ -148,35 +150,62 @@ namespace HighLevelOpenTKRenderLib
 
         private void glControlMain_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)  {
-                case Keys.W: { // forward
-                    CurrentScene.camera.MoveForward();
-                    break;
-                }
-                case Keys.S: { // backwards
-                    CurrentScene.camera.MoveBackward();
-                    break;
-                }
-                case Keys.A: { // left
-                    CurrentScene.camera.MoveLeft();
-                    break;
-                }
-                case Keys.D: { //right
-                    CurrentScene.camera.MoveRight();
-                    break;
-                }
-                case Keys.Space: { // up
-                    CurrentScene.camera.MoveUp();
-                    break;
-                }
-                case Keys.ShiftKey: { // down
-                    CurrentScene.camera.MoveDown();
-                    break;
-                }
+            switch (e.KeyCode)
+            {
+                case Keys.W:
+                    { // forward
+                        CurrentScene.camera.MoveForward();
+                        break;
+                    }
+                case Keys.S:
+                    { // backwards
+                        CurrentScene.camera.MoveBackward();
+                        break;
+                    }
+                case Keys.A:
+                    { // left
+                        CurrentScene.camera.MoveLeft();
+                        break;
+                    }
+                case Keys.D:
+                    { //right
+                        CurrentScene.camera.MoveRight();
+                        break;
+                    }
+                case Keys.Space:
+                    { // up
+                        CurrentScene.camera.MoveUp();
+                        break;
+                    }
+                case Keys.ShiftKey:
+                    { // down
+                        CurrentScene.camera.MoveDown();
+                        break;
+                    }
                 default: break;
             }
-            
 
+
+        }
+
+        private void glControlMain_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Middle)
+            {
+                CurrentScene.camera.ProcessMouseInputLook(e.X, e.Y);
+            }
+        }
+
+        private void glControlMain_MouseDown(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void glControlMain_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Middle)  {
+                CurrentScene.camera.firstMove = true;
+            }
         }
     }
 }
