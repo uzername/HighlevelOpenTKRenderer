@@ -190,7 +190,7 @@ namespace HighLevelOpenTKRenderLib
 
         private void glControlMain_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Middle)
+            if (e.Button == MouseButtons.Right)
             {
                 CurrentScene.camera.ProcessMouseInputLook(e.X, e.Y);
             }
@@ -203,7 +203,7 @@ namespace HighLevelOpenTKRenderLib
 
         private void glControlMain_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Middle)  {
+            if (e.Button == MouseButtons.Right)  {
                 CurrentScene.camera.firstMove = true;
             }
         }
