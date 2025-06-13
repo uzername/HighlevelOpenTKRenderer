@@ -12,12 +12,16 @@
     <None Remove="Shaders\background.vert" />
     <None Remove="Shaders\basic.frag" />
     <None Remove="Shaders\basic.vert" />
+    <None Remove="Shaders\phong.frag" />
+    <None Remove="Shaders\phong.vert" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Shaders\background.vert" />
     <EmbeddedResource Include="Shaders\basic.frag" />
     <EmbeddedResource Include="Shaders\basic.vert" />
+    <EmbeddedResource Include="Shaders\phong.frag" />
+    <EmbeddedResource Include="Shaders\phong.vert" />
   </ItemGroup>
 
   <ItemGroup>

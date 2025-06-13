@@ -25,6 +25,8 @@ namespace HighLevelOpenTKRenderLib
 
         private Shader backgroundShader;
         private Shader simpleobjectShader;
+        private Shader phongobjectShader;
+
         private int vaoBackground;
 
         public MainRenderControl()
@@ -65,8 +67,17 @@ namespace HighLevelOpenTKRenderLib
                 TextReader textReadFrag = new StreamReader(streambasicfrag);
                 simpleobjectShader = new Shader(textReadVert, textReadFrag);
             }
+            using (var streamphongvert = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.phong.vert"))
+            using (var streamphongfrag = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.phong.frag"))
+            {
+                TextReader textReadVert = new StreamReader(streamphongvert);
+                TextReader textReadFrag = new StreamReader(streamphongfrag);
+                phongobjectShader = new Shader(textReadVert, textReadFrag);
+            }
             CurrentScene = new Scene();
             CurrentScene.camera = new FirstPersonCamera(new Vector3(0, 0, 5), (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
+            CurrentScene.AddTestObject2();
+            CurrentScene.SceneLights.Add(new Light { Color = new Vector3(1,1,1), Position=new Vector3(3,3,3) });
 
             glControlMain.TabStop = true;
             glControlMain.Focus();
@@ -133,18 +144,33 @@ namespace HighLevelOpenTKRenderLib
             GL.Enable(EnableCap.DepthTest); // Re-enable for 3D scene
 
             //  Draw your scene here
-            simpleobjectShader.Use();
+            bool useSimpleShader = false;
+            foreach (var obj in CurrentScene.SceneObjects)
+            {
+                if (useSimpleShader)
+                {
+                    simpleobjectShader.Use();
+                    // Setup uniforms
+                    var view = CurrentScene.camera.GetViewMatrix();
+                    var projection = CurrentScene.camera.GetProjectionMatrix();
+                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("model"), false, ref obj.Transform);
+                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("view"), false, ref view);
+                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
 
-            // Setup uniforms
-            var view = CurrentScene.camera.GetViewMatrix();
-            var projection = CurrentScene.camera.GetProjectionMatrix();
-            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("model"), false, ref CurrentScene.object3D.Transform);
-            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("view"), false, ref view);
-            GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
+                    GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
+                } else
+                {
+                    phongobjectShader.SetVector3("lightPos", CurrentScene.SceneLights[0].Position);
+                    phongobjectShader.SetVector3("lightColor", CurrentScene.SceneLights[0].Color);
 
-            GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
+                    phongobjectShader.SetVector3("viewPos", CurrentScene.camera.Position);
 
-            CurrentScene.object3D.Draw();
+                    phongobjectShader.SetVector3("materialDiffuse", new Vector3(1.0f, 0.5f, 0.3f));
+                    phongobjectShader.SetVector3("materialSpecular", new Vector3(1.0f, 1.0f, 1.0f));
+                    phongobjectShader.SetFloat("materialShininess", 32.0f);
+                }
+                    obj.Draw();
+            }
             glControlMain.SwapBuffers();
         }
 
