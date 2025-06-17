@@ -50,7 +50,11 @@ namespace HighLevelOpenTKRenderLib
             );
         }
     }
-
+    /// <summary>
+    /// class that used to render object that does not use lighting. 
+    /// Accepts only vertex positions. Binds a single attribute (location = 0). 
+    /// Is suitable for flat/unlit color rendering.
+    /// </summary>
     public class SimpleObject3D: Object3D
     {
 
@@ -82,4 +86,42 @@ namespace HighLevelOpenTKRenderLib
             GL.BindVertexArray(0);
         }
     }
+
+    public class LitObject3D : Object3D
+    {
+        public LitObject3D(float[] vertexData, uint[] indices)
+        {
+            Vao = GL.GenVertexArray();
+            Vbo = GL.GenBuffer();
+            Ebo = GL.GenBuffer();
+
+            GL.BindVertexArray(Vao);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Vbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertexData.Length * sizeof(float), vertexData, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, Ebo);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+
+            int stride = 6 * sizeof(float); // 3 for pos, 3 for normal
+
+            // Position -> location = 0
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, 0);
+
+            // Normal -> location = 1
+            GL.EnableVertexAttribArray(1);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, stride, 3 * sizeof(float));
+
+            GL.BindVertexArray(0);
+        }
+
+        public override void Draw()
+        {
+            GL.BindVertexArray(Vao);
+            GL.DrawElements(PrimitiveType.Triangles, 36, DrawElementsType.UnsignedInt, 0);
+            GL.BindVertexArray(0);
+        }
+    }
+
 }

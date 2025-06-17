@@ -144,10 +144,9 @@ namespace HighLevelOpenTKRenderLib
             GL.Enable(EnableCap.DepthTest); // Re-enable for 3D scene
 
             //  Draw your scene here
-            bool useSimpleShader = false;
             foreach (var obj in CurrentScene.SceneObjects)
             {
-                if (useSimpleShader)
+                if (obj is SimpleObject3D)
                 {
                     simpleobjectShader.Use();
                     // Setup uniforms
@@ -158,8 +157,16 @@ namespace HighLevelOpenTKRenderLib
                     GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
 
                     GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
-                } else
-                {
+                } else if (obj is LitObject3D) {
+                
+                    phongobjectShader.Use();
+                    // Setup uniforms
+                    var view = CurrentScene.camera.GetViewMatrix();
+                    var projection = CurrentScene.camera.GetProjectionMatrix();
+                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("model"), false, ref obj.Transform);
+                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("view"), false, ref view);
+                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("projection"), false, ref projection);
+
                     phongobjectShader.SetVector3("lightPos", CurrentScene.SceneLights[0].Position);
                     phongobjectShader.SetVector3("lightColor", CurrentScene.SceneLights[0].Color);
 
