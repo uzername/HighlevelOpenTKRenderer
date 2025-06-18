@@ -11,7 +11,7 @@ namespace HighlevelOpenTKRenderer
             // add this from code to avoid exception
             renderControl = new MainRenderControl();
             renderControl.Dock = DockStyle.Fill;
-            this.Controls.Add(renderControl);
+            this.tableLayoutPanelMain.Controls.Add(renderControl,0,0);
         }
     }
 }

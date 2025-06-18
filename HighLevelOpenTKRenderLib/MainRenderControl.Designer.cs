@@ -45,6 +45,7 @@
             glControlMain.Size = new Size(555, 391);
             glControlMain.TabIndex = 0;
             glControlMain.KeyDown += glControlMain_KeyDown;
+            glControlMain.KeyPress += glControlMain_KeyPress;
             glControlMain.MouseDown += glControlMain_MouseDown;
             glControlMain.MouseMove += glControlMain_MouseMove;
             glControlMain.MouseUp += glControlMain_MouseUp;

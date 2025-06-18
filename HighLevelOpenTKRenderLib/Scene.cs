@@ -31,7 +31,7 @@ namespace HighLevelOpenTKRenderLib
         {
             uint[] testcubeIndices = new uint[] { };
             float[] testcubeVertices = new float[] { };
-            MeshConstructor3D.GetCubeMesh(1.0f, out testcubeVertices, out testcubeIndices);
+            MeshConstructor3D.GetCubeMeshWithNormals(2.0f, out testcubeVertices, out testcubeIndices);
             SceneObjects.Add(new LitObject3D(testcubeVertices, testcubeIndices));
             SceneObjects[SceneObjects.Count-1].MoveTo(0, 0, -3);
         }

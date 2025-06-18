@@ -77,7 +77,7 @@ namespace HighLevelOpenTKRenderLib
             CurrentScene = new Scene();
             CurrentScene.camera = new FirstPersonCamera(new Vector3(0, 0, 5), (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
             CurrentScene.AddTestObject2();
-            CurrentScene.SceneLights.Add(new Light { Color = new Vector3(1,1,1), Position=new Vector3(3,3,3) });
+            CurrentScene.SceneLights.Add(new Light { Color = new Vector3(1, 1, 1), Position = new Vector3(3, 3, 3) });
 
             glControlMain.TabStop = true;
             glControlMain.Focus();
@@ -100,6 +100,8 @@ namespace HighLevelOpenTKRenderLib
             if (CurrentScene.camera is CameraMk2 cam)
             {
                 float aspectRatio = (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height;
+                // changing aspect ration will recalculate projection matrix
+                
                 cam.AspectRatio = aspectRatio;
             }
 
@@ -157,8 +159,10 @@ namespace HighLevelOpenTKRenderLib
                     GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
 
                     GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
-                } else if (obj is LitObject3D) {
-                
+                }
+                else if (obj is LitObject3D)
+                {
+
                     phongobjectShader.Use();
                     // Setup uniforms
                     var view = CurrentScene.camera.GetViewMatrix();
@@ -176,7 +180,7 @@ namespace HighLevelOpenTKRenderLib
                     phongobjectShader.SetVector3("materialSpecular", new Vector3(1.0f, 1.0f, 1.0f));
                     phongobjectShader.SetFloat("materialShininess", 32.0f);
                 }
-                    obj.Draw();
+                obj.Draw();
             }
             glControlMain.SwapBuffers();
         }
@@ -236,9 +240,20 @@ namespace HighLevelOpenTKRenderLib
 
         private void glControlMain_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)  {
+            if (e.Button == MouseButtons.Right)
+            {
                 CurrentScene.camera.firstMove = true;
             }
         }
+
+        private void glControlMain_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar=='p')  {
+                bool newPerspCamera = !CurrentScene.camera.isPerspective;
+                    CurrentScene.camera.SetPerspectiveCamera(newPerspCamera);
+                
+            }
+        }
+
     }
 }

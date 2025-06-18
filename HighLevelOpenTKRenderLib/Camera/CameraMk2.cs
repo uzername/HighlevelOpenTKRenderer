@@ -65,6 +65,17 @@ namespace HighLevelOpenTKRenderLib
 
         public float NearPlane = 0.01f;
         public float FarPlane = 100f;
+
+        public bool isPerspective { get; private set; } = true;
+        public float OrthoZoom = 10f;
+        public float OrthoZoomFactor = 0.4f;
+        public void SetPerspectiveCamera(bool isPerspectiveCamera)
+        {
+            isPerspective = isPerspectiveCamera;
+            
+            UpdateProjectionMatrix();
+        }
+
         // We convert from degrees to radians as soon as the property is set to improve performance.
         public float Pitch
         {
@@ -108,14 +119,38 @@ namespace HighLevelOpenTKRenderLib
         {
             return Matrix4.LookAt(Position, Position + _front, _up);
         }
+
+        public void ZoomInOrtho()
+        {
+            OrthoZoom = Math.Max(0.1f, OrthoZoom - OrthoZoomFactor);
+            UpdateProjectionMatrix();
+        }
+        public void ZoomOutOrtho()
+        {
+            OrthoZoom += OrthoZoomFactor;
+            UpdateProjectionMatrix();
+        }
+
+        /// <summary>
+        /// in perspective camera this is called only when aspect ratio is changed
+        /// </summary>
         private void UpdateProjectionMatrix()
         {
-            _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(
-                MathHelper.DegreesToRadians(Fov),
-                _aspectRatio,
-                NearPlane,
-                FarPlane
-            );
+            if (isPerspective)
+            {
+                _projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(
+                    MathHelper.DegreesToRadians(Fov),
+                    _aspectRatio,
+                    NearPlane,
+                    FarPlane
+                );
+            } else
+            {
+                float orthoHeight0 = OrthoZoom; 
+                float orthoWidth0 = orthoHeight0 * _aspectRatio;
+
+                _projectionMatrix = Matrix4.CreateOrthographic(orthoWidth0, orthoHeight0, NearPlane, FarPlane);
+            }
         }
         // Get the projection matrix using the same method we have used up until this point
         public Matrix4 GetProjectionMatrix()

@@ -22,12 +22,18 @@ namespace HighLevelOpenTKRenderLib
         }
         public void MoveForward()
         {
-            this.Position += this.Front * cameraSpeed;
+            if (this.isPerspective)
+                this.Position += this.Front * cameraSpeed;
+            else
+                this.ZoomInOrtho();
         }
 
         public void MoveBackward()
         {
-            this.Position -= this.Front * cameraSpeed;
+            if (this.isPerspective)
+                this.Position -= this.Front * cameraSpeed;
+            else
+                this.ZoomOutOrtho();
         }
 
         public void MoveDown()
