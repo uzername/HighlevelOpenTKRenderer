@@ -15,5 +15,6 @@ namespace HighLevelOpenTKRenderLib
         public void MoveForward();
         public void MoveBackward();
         public void ProcessMouseInputLook(int cX, int cY);
+        public void ProcessMouseScroll(int de);
     }
 }

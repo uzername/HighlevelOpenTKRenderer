@@ -76,5 +76,16 @@ namespace HighLevelOpenTKRenderLib
                 this.Pitch -= deltaY * sensitivity; // Reversed since y-coordinates range from bottom to top
             }
         }
+        // move forward or move backward on mouse scroll
+        public void ProcessMouseScroll(int delta)
+        {
+            if (delta<0)
+            {
+                MoveBackward();
+            } else
+            {
+                MoveForward();
+            }
+        }
     }
 }

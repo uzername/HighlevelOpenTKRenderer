@@ -37,10 +37,12 @@ namespace HighLevelOpenTKRenderLib
             glControlMain.Paint += glControlMain_Paint;
             glControlMain.Resize += glControlMain_Resize;
             glControlMain.Load += glControlMain_Load;
+            glControlMain.MouseWheel += OnEvent_MouseWheel;
 
             // Set up continuous rendering
             Application.Idle += Application_Idle;
         }
+
         private bool initialized = false;
         private void glControlMain_Load(object sender, EventArgs e)
         {
@@ -184,7 +186,10 @@ namespace HighLevelOpenTKRenderLib
             }
             glControlMain.SwapBuffers();
         }
-
+        private void OnEvent_MouseWheel(object? sender, MouseEventArgs e)
+        {
+            CurrentScene.camera.ProcessMouseScroll(e.Delta);
+        }
         private void glControlMain_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)

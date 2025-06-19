@@ -104,6 +104,7 @@ namespace HighLevelOpenTKRenderLib
 
         // The field of view (FOV) is the vertical angle of the camera view.
         // We convert from degrees to radians as soon as the property is set to improve performance.
+        // Human FOV is around 90–120 degrees overall, but when focusing, it's effectively smaller — about 55–60 degrees. Most 3D apps use a wider FOV like 70–90 degrees, exaggerating perspective.
         public float Fov
         {
             get => MathHelper.RadiansToDegrees(_fov);
