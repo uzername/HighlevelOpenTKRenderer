@@ -25,7 +25,11 @@ I'd like to build a solution around OpenTK Winforms control v 4.0 , using modern
 - MainRenderControl that contains OpenTK winforms control instance, an entry point of library
 - CameraMk2 - base class for camera, parent for FreeMoveCamera and OrbitingCamera. Orthogonal and perspective camera setting (I assume it should not really be a separate class for it, it is just about mode of matrix calculation.
     - ICameraControl - control scheme of camera
+	  - FirstPersonCamera
+	  - OrbitingCamera
 - Object3D - generic object for items on scene. it contains transformations in matrix form. Also it has vertices and indices
+    - SimpleObject3D - Object3D that ignores lighting on rendering
+	- LitObject3D - uses Phong shader and requires normals for rendering
 - MeshConstructor3D - utility class to construct vertices and indices for cylinder, cube, sphere
 - Scene - collection of objects. While rendering inside MainRenderControl, a cycle runs over this collection to show object3d . It should have methods to remove object from scene, add created and set up Object3D to scene.
 - Light - OpenGL has no concept of light, it is just a setting of shader. But for scene logic it is important to have light as object that can be translated around. 

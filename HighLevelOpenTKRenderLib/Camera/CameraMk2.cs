@@ -13,11 +13,11 @@ namespace HighLevelOpenTKRenderLib
     public class CameraMk2
     {
         // Those vectors are directions pointing outwards from the camera to define how it rotated.
-        private Vector3 _front = -Vector3.UnitZ;
+        protected Vector3 _front = -Vector3.UnitZ;
 
-        private Vector3 _up = Vector3.UnitY;
+        protected Vector3 _up = Vector3.UnitY;
 
-        private Vector3 _right = Vector3.UnitX;
+        protected Vector3 _right = Vector3.UnitX;
 
         // Rotation around the X axis (radians)
         private float _pitch;

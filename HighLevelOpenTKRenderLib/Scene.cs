@@ -17,8 +17,7 @@ namespace HighLevelOpenTKRenderLib
         public Light AmbientLight;
         public List<Object3D> SceneObjects;
         
-        //public SimpleCamera camera;
-        public FirstPersonCamera camera;
+        public OrbitingCamera camera;
         public SimpleObject3D object3D;
         public Scene() {
             SceneLights = new List<Light>();
