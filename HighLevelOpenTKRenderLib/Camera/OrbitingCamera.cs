@@ -21,6 +21,7 @@ namespace HighLevelOpenTKRenderLib
 
         public OrbitingCamera(Vector3 position, float aspectRatio, float fieldOfView) 
             : base(position, aspectRatio, fieldOfView)   {
+            Yaw = 90f;
             ViewTarget = Position + Front * distanceToTarget;
             UpdateCameraPosition();
         }

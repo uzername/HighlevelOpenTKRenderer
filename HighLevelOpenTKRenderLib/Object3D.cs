@@ -13,6 +13,7 @@ namespace HighLevelOpenTKRenderLib
         public int Vao, Vbo, Ebo;
         public Matrix4 Transform = Matrix4.Identity;
         /* for example A standard triangulated cube has: 6 faces. Each face is made of 2 triangles. Each triangle has 3 vertices */
+        public bool DrawTriangles =true;
         protected int indicesCount;
         public virtual void Draw()
         {
@@ -85,8 +86,12 @@ namespace HighLevelOpenTKRenderLib
         public override void Draw()
         {
             GL.BindVertexArray(Vao);
-            GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, 0); // assuming 36 indices
-            GL.BindVertexArray(0);
+            if (DrawTriangles)  {
+                GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, 0);
+            } else {
+                GL.DrawElements(PrimitiveType.Lines, indicesCount, DrawElementsType.UnsignedInt, 0);
+            }
+                GL.BindVertexArray(0);
         }
     }
 
@@ -123,8 +128,13 @@ namespace HighLevelOpenTKRenderLib
         public override void Draw()
         {
             GL.BindVertexArray(Vao);
-            GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, 0);
-            GL.BindVertexArray(0);
+            if (DrawTriangles)  {
+                GL.DrawElements(PrimitiveType.Triangles, indicesCount, DrawElementsType.UnsignedInt, 0);
+            }
+            else {
+                GL.DrawElements(PrimitiveType.Lines, indicesCount, DrawElementsType.UnsignedInt, 0);
+            }
+                GL.BindVertexArray(0);
         }
     }
 

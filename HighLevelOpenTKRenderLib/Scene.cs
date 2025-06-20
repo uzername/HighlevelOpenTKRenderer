@@ -33,6 +33,17 @@ namespace HighLevelOpenTKRenderLib
             MeshConstructor3D.GetCubeMeshWithNormals(2.0f, out testcubeVertices, out testcubeIndices);
             SceneObjects.Add(new LitObject3D(testcubeVertices, testcubeIndices));
             SceneObjects[SceneObjects.Count-1].MoveTo(0, 0, -3);
+
+            MeshConstructor3D.GetCubeMeshWithNormals(0.5f, out testcubeVertices, out testcubeIndices);
+            LitObject3D central = new LitObject3D(testcubeVertices, testcubeIndices);
+            SceneObjects.Add(central);
+
+            uint[] testgridIndices = new uint[] { };
+            float[] testgridVertices = new float[] { };
+            MeshConstructor3D.GetSimpleGridMesh(50.0f, 50.0f, 50, 50, out testgridVertices, out testgridIndices);
+            SimpleObject3D simpleGrid= new SimpleObject3D(testgridVertices, testgridIndices);
+            simpleGrid.DrawTriangles = false;
+            SceneObjects.Add(simpleGrid);
         }
     }
 }
