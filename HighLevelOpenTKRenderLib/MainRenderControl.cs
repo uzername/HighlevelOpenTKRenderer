@@ -77,7 +77,7 @@ namespace HighLevelOpenTKRenderLib
                 phongobjectShader = new Shader(textReadVert, textReadFrag);
             }
             CurrentScene = new Scene();
-            CurrentScene.camera = new OrbitingCamera(new Vector3(0, 0, 5), (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
+            CurrentScene.camera = new OrbitingCamera(new Vector3(0, 0, 0), 5.0f, (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
             CurrentScene.AddTestObject2();
             CurrentScene.SceneLights.Add(new Light { Color = new Vector3(1, 1, 1), Position = new Vector3(3, 3, 3) });
 
@@ -147,7 +147,8 @@ namespace HighLevelOpenTKRenderLib
             GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
             GL.Enable(EnableCap.DepthTest); // Re-enable for 3D scene
 
-            //  Draw your scene here
+            //  Draw scene here. I cannot move selection of shaders and setting uniforms to their appropriate Draw() method because
+            //  they use camera and light source which is related to scene
             foreach (var obj in CurrentScene.SceneObjects)
             {
                 if (obj is SimpleObject3D)

@@ -31,7 +31,7 @@ namespace HighLevelOpenTKRenderLib
         /// create camera with initial position and aspect ratio and field of view
         /// </summary>
         /// <param name="position"></param>
-        /// <param name="aspectRatio">best value is 1, but it is calculated from dimensions of control</param>
+        /// <param name="aspectRatio"> it is calculated from dimensions of control</param>
         /// <param name="fieldOfView">angle field of view in DEGREES, it will be converted later. Best value is 60</param>
         public CameraMk2(Vector3 position, float aspectRatio, float fieldOfView)
         {

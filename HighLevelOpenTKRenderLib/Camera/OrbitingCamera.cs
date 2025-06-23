@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HighLevelOpenTKRenderLib
 {
@@ -18,11 +19,58 @@ namespace HighLevelOpenTKRenderLib
         // View target of camera. when this point moves then camera moves together with it, they are bound
         public Vector3 ViewTarget;
         private float distanceToTarget = 5f;
-
+        /// <summary>
+        /// Initializes camera from position. 
+        /// Sets ViewTarget based on Front and distanceToTarget. 
+        ///  Good for compatibility with existing camera code but better not to use this
+        /// </summary>
+        /// <param name="position">point where camera is expected to appear</param>
+        /// <param name="aspectRatio"></param>
+        /// <param name="fieldOfView">angle field of view in DEGREES, it will be converted later. Best value is 60</param>
         public OrbitingCamera(Vector3 position, float aspectRatio, float fieldOfView) 
             : base(position, aspectRatio, fieldOfView)   {
             Yaw = 90f;
             ViewTarget = Position + Front * distanceToTarget;
+            UpdateCameraPosition();
+        }
+        /// <summary>
+        /// Initializes camera from view target  and distance to it.
+        /// BETTER USE THIS. More precise, ideal for orbit control . Avoids ambiguity . 
+        /// </summary>
+        /// <param name="viewTarget">point at which camera is looking</param>
+        /// <param name="distanceToTarget">distance from camera to point at which camera is looking</param>
+        /// <param name="aspectRatio"></param>
+        /// <param name="fieldOfView">angle field of view in DEGREES, it will be converted later. Best value is 60</param>
+        public OrbitingCamera(Vector3 viewTarget, float distanceToTarget, float aspectRatio, float fieldOfView)
+    : base(Vector3.Zero, aspectRatio, fieldOfView) // Position is calculated later
+        {
+            this.ViewTarget = viewTarget;
+            this.distanceToTarget = distanceToTarget;
+
+            // Set default orientation
+            Yaw = 90f;
+            Pitch = 0f;
+
+            UpdateCameraPosition(); // Derives Position based on ViewTarget and distance
+        }
+        /// <summary>
+        /// Most detailed and mathematically correct initializer of Orbiting camera
+        /// </summary>
+        /// <param name="viewTarget"></param>
+        /// <param name="distanceToTarget"></param>
+        /// <param name="yawDegrees">Yaw (horizontal angle). May be any number. Yaw = 90deg is +Z, 180deg is –X, 270deg is –Z (and so on) </param>
+        /// <param name="pitchDegrees">Pitch (vertical angle). Range -89 degrees to +89 degrees. Pitch +90 or -90 may look camera look up or down straight which causes div by zero and bad cross product and bad Right vector of camera (Front and Up vectors become parallel)</param>
+        /// <param name="aspectRatio"></param>
+        /// <param name="fieldOfView"></param>
+        public OrbitingCamera(Vector3 viewTarget, float distanceToTarget, float yawDegrees, float pitchDegrees, float aspectRatio, float fieldOfView)
+    : base(Vector3.Zero, aspectRatio, fieldOfView)
+        {
+            ViewTarget = viewTarget;
+            distanceToTarget = MathF.Max(distanceToTarget, 0.001f); // avoid zero-distance
+
+            Yaw = yawDegrees;
+            Pitch = MathHelper.Clamp(pitchDegrees, -89f, 89f); // enforce safe pitch
+
             UpdateCameraPosition();
         }
 

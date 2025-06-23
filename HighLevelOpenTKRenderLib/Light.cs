@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 
 namespace HighLevelOpenTKRenderLib
 {
+    /// <summary>
+    /// phong shader - light source
+    /// </summary>
     public class Light
     {
         public Vector3 Position;
         public Vector3 Color;
     }
+    /// <summary>
+    /// phong shader - material
+    /// </summary>
     public class Material
     {
         public Vector3 DiffuseColor;
