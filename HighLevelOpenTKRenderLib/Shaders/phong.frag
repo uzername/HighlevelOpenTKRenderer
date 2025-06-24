@@ -10,7 +10,7 @@ uniform vec3 viewPos;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 
-uniform vec3 materialDiffuse;
+uniform vec4 materialDiffuse; // includes alpha
 uniform vec3 materialSpecular;
 uniform float materialShininess;
 
@@ -31,7 +31,8 @@ void main()
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
     vec3 specular = spec * materialSpecular * lightColor;
-
-    vec3 result = (ambient + diffuse + specular) * materialDiffuse;
-    FragColor = vec4(result, 1.0);
+    // multiply only by threecomponent subvector
+    vec3 result = (ambient + diffuse + specular) * materialDiffuse.rgb;
+    // append alpha component
+    FragColor = vec4(result, materialDiffuse.a);
 }

@@ -48,6 +48,10 @@ namespace HighLevelOpenTKRenderLib
         {
             if (initialized) return;
             glControlMain.MakeCurrent();
+            // this one is for transparency
+            // alpha value affects how "fragment" from fragment shader is combined with what's already in the framebuffer.
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             // https://stackoverflow.com/a/35780405
             // You can't read Resource Files with File.ReadAllText.
@@ -129,6 +133,76 @@ namespace HighLevelOpenTKRenderLib
         }
         private void Render()
         {
+            void prepareRenderObj(Object3D obj)
+            {
+                if (obj is SimpleObject3D)
+                {
+                    simpleobjectShader.Use();
+                    // Setup uniforms
+                    var view = CurrentScene.camera.GetViewMatrix();
+                    var projection = CurrentScene.camera.GetProjectionMatrix();
+                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("model"), false, ref obj.Transform);
+                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("view"), false, ref view);
+                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
+
+                    GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), (obj as SimpleObject3D).SimpleColor);
+                }
+                else if (obj is LitObject3D)
+                {
+
+                    phongobjectShader.Use();
+                    // Setup uniforms
+                    var view = CurrentScene.camera.GetViewMatrix();
+                    var projection = CurrentScene.camera.GetProjectionMatrix();
+                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("model"), false, ref obj.Transform);
+                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("view"), false, ref view);
+                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("projection"), false, ref projection);
+
+                    phongobjectShader.SetVector3("lightPos", CurrentScene.SceneLights[0].Position);
+                    phongobjectShader.SetVector3("lightColor", CurrentScene.SceneLights[0].Color);
+
+                    phongobjectShader.SetVector3("viewPos", CurrentScene.camera.Position);
+
+                    phongobjectShader.SetVector4("materialDiffuse", (obj as LitObject3D).LitMaterial.DiffuseColor);
+                    phongobjectShader.SetVector3("materialSpecular", (obj as LitObject3D).LitMaterial.SpecularColor);
+                    phongobjectShader.SetFloat("materialShininess", (obj as LitObject3D).LitMaterial.Shininess);
+                }
+            }
+            void renderOpaqueObjects()
+            {
+                foreach (var objjj in CurrentScene.SceneObjects)
+                {
+                    if ((objjj is SimpleObject3D) || ((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1))
+                    {
+                        prepareRenderObj(objjj);
+                        objjj.Draw();
+                    }
+                }
+            }
+            void renderTransparentObjects()
+            {
+                List<LitObject3D> TransparentObjects = new List<LitObject3D>();
+                foreach (var objjj in CurrentScene.SceneObjects)
+                {
+                    
+                    if (((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1) == false)
+                    {
+                        if (objjj is LitObject3D)
+                            TransparentObjects.Add(objjj as LitObject3D);
+                    }
+                    
+                }
+                if (TransparentObjects.Count != 0)
+                {
+                    // This sorts objects back to front relative to the camera, so transparency blends correctly and obj.Transform.Row3.Xyz represents position
+                    TransparentObjects.OrderByDescending(obj => (CurrentScene.camera.Position - obj.Transform.Row3.Xyz).LengthSquared);
+                }
+                foreach (var objjj1 in TransparentObjects) {
+                    prepareRenderObj(objjj1);
+                    objjj1.Draw();
+                }
+            }
+
             if (!glControlMain.Context.IsCurrent)
                 glControlMain.MakeCurrent();
 
@@ -149,42 +223,23 @@ namespace HighLevelOpenTKRenderLib
 
             //  Draw scene here. I cannot move selection of shaders and setting uniforms to their appropriate Draw() method because
             //  they use camera and light source which is related to scene
+            
+            // Render opaque objects
+            GL.Disable(EnableCap.Blend);
+            renderOpaqueObjects();
+
+            // Render transparent objects
+            GL.Enable(EnableCap.Blend);
+            GL.DepthMask(false); // important for transparency!
+            renderTransparentObjects();
+            GL.DepthMask(true);
+            /*
             foreach (var obj in CurrentScene.SceneObjects)
             {
-                if (obj is SimpleObject3D)
-                {
-                    simpleobjectShader.Use();
-                    // Setup uniforms
-                    var view = CurrentScene.camera.GetViewMatrix();
-                    var projection = CurrentScene.camera.GetProjectionMatrix();
-                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("model"), false, ref obj.Transform);
-                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("view"), false, ref view);
-                    GL.UniformMatrix4(simpleobjectShader.GetUniformLocation("projection"), false, ref projection);
-
-                    GL.Uniform4(simpleobjectShader.GetUniformLocation("color"), new OpenTK.Mathematics.Vector4(1.0f, 0.6f, 0.1f, 1.0f));
-                }
-                else if (obj is LitObject3D)
-                {
-
-                    phongobjectShader.Use();
-                    // Setup uniforms
-                    var view = CurrentScene.camera.GetViewMatrix();
-                    var projection = CurrentScene.camera.GetProjectionMatrix();
-                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("model"), false, ref obj.Transform);
-                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("view"), false, ref view);
-                    GL.UniformMatrix4(phongobjectShader.GetUniformLocation("projection"), false, ref projection);
-
-                    phongobjectShader.SetVector3("lightPos", CurrentScene.SceneLights[0].Position);
-                    phongobjectShader.SetVector3("lightColor", CurrentScene.SceneLights[0].Color);
-
-                    phongobjectShader.SetVector3("viewPos", CurrentScene.camera.Position);
-
-                    phongobjectShader.SetVector3("materialDiffuse", new Vector3(1.0f, 0.5f, 0.3f));
-                    phongobjectShader.SetVector3("materialSpecular", new Vector3(1.0f, 1.0f, 1.0f));
-                    phongobjectShader.SetFloat("materialShininess", 32.0f);
-                }
+                prepareRenderObj(obj);
                 obj.Draw();
             }
+            */
             glControlMain.SwapBuffers();
         }
         private void OnEvent_MouseWheel(object? sender, MouseEventArgs e)

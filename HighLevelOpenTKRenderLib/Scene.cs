@@ -31,7 +31,9 @@ namespace HighLevelOpenTKRenderLib
             uint[] testcubeIndices = new uint[] { };
             float[] testcubeVertices = new float[] { };
             MeshConstructor3D.GetCubeMeshWithNormals(2.0f, out testcubeVertices, out testcubeIndices);
-            SceneObjects.Add(new LitObject3D(testcubeVertices, testcubeIndices));
+            LitObject3D exampleObject = new LitObject3D(testcubeVertices, testcubeIndices);
+            exampleObject.LitMaterial.DiffuseColor = new Vector4(0.5f, 0.7f, 0.6f, 0.5f);
+            SceneObjects.Add(exampleObject);
             SceneObjects[SceneObjects.Count-1].MoveTo(0, 0, -3);
 
             MeshConstructor3D.GetCubeMeshWithNormals(0.5f, out testcubeVertices, out testcubeIndices);
@@ -42,6 +44,7 @@ namespace HighLevelOpenTKRenderLib
             float[] testgridVertices = new float[] { };
             MeshConstructor3D.GetSimpleGridMesh(50.0f, 50.0f, 50, 50, out testgridVertices, out testgridIndices);
             SimpleObject3D simpleGrid= new SimpleObject3D(testgridVertices, testgridIndices);
+            simpleGrid.SimpleColor = new Vector4(0.25f);
             simpleGrid.DrawTriangles = false;
             SceneObjects.Add(simpleGrid);
         }

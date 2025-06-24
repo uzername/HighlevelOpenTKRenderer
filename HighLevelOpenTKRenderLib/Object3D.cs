@@ -13,6 +13,9 @@ namespace HighLevelOpenTKRenderLib
         public int Vao, Vbo, Ebo;
         public Matrix4 Transform = Matrix4.Identity;
         /* for example A standard triangulated cube has: 6 faces. Each face is made of 2 triangles. Each triangle has 3 vertices */
+        /// <summary>
+        /// how to draw this Object3D: either lines or filled triangles. Lines are best used for MeshConstructor3D::GetSimpleGridMesh()
+        /// </summary>
         public bool DrawTriangles =true;
         protected int indicesCount;
         public virtual void Draw()
@@ -60,7 +63,7 @@ namespace HighLevelOpenTKRenderLib
     /// </summary>
     public class SimpleObject3D: Object3D
     {
-
+        public Vector4 SimpleColor = new Vector4(1.0f,1.0f,1.0f,1.0f);
         public SimpleObject3D(float[] vertices, uint[] indices)
         {
             indicesCount = indices.Length;
@@ -97,6 +100,7 @@ namespace HighLevelOpenTKRenderLib
 
     public class LitObject3D : Object3D
     {
+        public Material LitMaterial = new Material();
         public LitObject3D(float[] vertexData, uint[] indices)
         {
             indicesCount = indices.Length;
