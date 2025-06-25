@@ -10,7 +10,19 @@ namespace HighLevelOpenTKRenderLib
 {
     public class Object3D
     {
+        /// <summary>
+        /// Vao - vertex array object, vbo - vertex buffer object, that contain vertex attribute and index data (the latter is sometimes called element data). 
+        /// EBO also has index data. those are number - pointers to arrays that are stored in video memory
+        /// </summary>
         public int Vao, Vbo, Ebo;
+        /// <summary>
+        /// identifier in scene collection
+        /// </summary>
+        public string UniqueName = "MyObject";
+        /// <summary>
+        /// if false then skipped from rendering
+        /// </summary>
+        public bool IsShown = true;
         public Matrix4 Transform = Matrix4.Identity;
         /* for example A standard triangulated cube has: 6 faces. Each face is made of 2 triangles. Each triangle has 3 vertices */
         /// <summary>

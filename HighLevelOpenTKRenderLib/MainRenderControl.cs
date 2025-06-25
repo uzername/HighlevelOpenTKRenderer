@@ -172,7 +172,7 @@ namespace HighLevelOpenTKRenderLib
             {
                 foreach (var objjj in CurrentScene.SceneObjects)
                 {
-                    if ((objjj is SimpleObject3D) || ((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1))
+                    if (((objjj is SimpleObject3D) || ((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1))&& objjj.IsShown)
                     {
                         prepareRenderObj(objjj);
                         objjj.Draw();
@@ -185,7 +185,7 @@ namespace HighLevelOpenTKRenderLib
                 foreach (var objjj in CurrentScene.SceneObjects)
                 {
                     
-                    if (((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1) == false)
+                    if ( (((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1) == false)&& objjj.IsShown )
                     {
                         if (objjj is LitObject3D)
                             TransparentObjects.Add(objjj as LitObject3D);
