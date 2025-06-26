@@ -75,6 +75,7 @@ namespace HighLevelOpenTKRenderLib
             gridVertices = vertices.ToArray();
             gridIndices = indices.ToArray();
         }
+        #region Mesh generator  Cube
         public static void GetCubeMesh(in float size, out float[] cubeVertices, out uint[] cubeIndices)
         {
             float cubeSide = size / 2f;
@@ -163,6 +164,8 @@ namespace HighLevelOpenTKRenderLib
        20,21,22, 22,23,20
             };
         }
+        #endregion
+        #region Mesh generator  Sphere
         /// <summary>
         /// generate sphere with center in 0;0 with specified diameter and level of detail, include normals for rendering as a lit shape.
         /// ChatGPT generated this code for me, thanks a lot
@@ -265,8 +268,8 @@ namespace HighLevelOpenTKRenderLib
                             radius * MathF.Sin(phi2) * MathF.Sin(theta2)
                         );
 
-                        // First triangle
-                        Vector3 normal1 = Vector3.Normalize(Vector3.Cross(p2 - p1, p3 - p1));
+                        // First triangle. Normals are set for each point but they are the same
+                        Vector3 normal1 = Vector3.Normalize(Vector3.Cross(p3 - p1, p2 - p1));
                         verts.AddRange(new float[] { p1.X, p1.Y, p1.Z, normal1.X, normal1.Y, normal1.Z });
                         verts.AddRange(new float[] { p2.X, p2.Y, p2.Z, normal1.X, normal1.Y, normal1.Z });
                         verts.AddRange(new float[] { p3.X, p3.Y, p3.Z, normal1.X, normal1.Y, normal1.Z });
@@ -277,7 +280,12 @@ namespace HighLevelOpenTKRenderLib
                         inds.Add(baseIndex + 2);
 
                         // Second triangle
-                        Vector3 normal2 = Vector3.Normalize(Vector3.Cross(p4 - p2, p3 - p2));
+                        Vector3 normal2 = Vector3.Normalize(Vector3.Cross(p3 - p2, p4 - p2));
+                        /*
+                         in case of abnormalities (if scalar multiplication is bigger than 0 then vector of view runs in similar direction as normal), flip normals:
+                        if (Vector3.Dot(normal1, ViewTarget - Position) > 0)
+                            normal1 = -normal1;
+                         */
                         verts.AddRange(new float[] { p2.X, p2.Y, p2.Z, normal2.X, normal2.Y, normal2.Z });
                         verts.AddRange(new float[] { p4.X, p4.Y, p4.Z, normal2.X, normal2.Y, normal2.Z });
                         verts.AddRange(new float[] { p3.X, p3.Y, p3.Z, normal2.X, normal2.Y, normal2.Z });
@@ -289,10 +297,69 @@ namespace HighLevelOpenTKRenderLib
                     }
                 }
             }
-
             vertices = verts.ToArray();
             indices = inds.ToArray();
-
         }
+        /// <summary>
+        /// get vertices and indices for sphere with specified diameter to render as unlit shape
+        /// </summary>
+        /// <param name="diameter"></param>
+        /// <param name="vertices"></param>
+        /// <param name="indices"></param>
+        public static void getSphereMesh(float diameter, out float[] vertices, out uint[] indices)
+        {
+            byte levelOfDetail = 1;
+            float radius = diameter / 2f;
+            int latitudeBands = 8 * levelOfDetail;
+            int longitudeBands = 16 * levelOfDetail;
+
+            List<float> verts = new();
+            List<uint> inds = new();
+
+            for (int lat = 0; lat <= latitudeBands; lat++)
+            {
+                float theta = lat * MathF.PI / latitudeBands;
+                float sinTheta = MathF.Sin(theta);
+                float cosTheta = MathF.Cos(theta);
+
+                for (int lon = 0; lon <= longitudeBands; lon++)
+                {
+                    float phi = lon * 2 * MathF.PI / longitudeBands;
+                    float sinPhi = MathF.Sin(phi);
+                    float cosPhi = MathF.Cos(phi);
+
+                    float x = cosPhi * sinTheta;
+                    float y = cosTheta;
+                    float z = sinPhi * sinTheta;
+
+                    // Position
+                    verts.Add(x * radius);
+                    verts.Add(y * radius);
+                    verts.Add(z * radius);
+
+                }
+            }
+
+            for (int lat = 0; lat < latitudeBands; lat++)
+            {
+                for (int lon = 0; lon < longitudeBands; lon++)
+                {
+                    uint first = (uint)(lat * (longitudeBands + 1) + lon);
+                    uint second = first + (uint)(longitudeBands + 1);
+
+                    inds.Add(first);
+                    inds.Add(second);
+                    inds.Add(first + 1);
+
+                    inds.Add(second);
+                    inds.Add(second + 1);
+                    inds.Add(first + 1);
+                }
+            }
+            vertices = verts.ToArray();
+            indices = inds.ToArray();
+        }
+        #endregion
+    
     }
 }

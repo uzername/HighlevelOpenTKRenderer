@@ -17,7 +17,7 @@ namespace HighLevelOpenTKRenderLib
         public Light AmbientLight;
         public List<Object3D> SceneObjects;
         
-        public OrbitingCamera camera;
+        public FirstPersonCamera camera;
         public SimpleObject3D object3D;
         public Scene() {
             SceneLights = new List<Light>();
@@ -34,8 +34,8 @@ namespace HighLevelOpenTKRenderLib
             LitObject3D exampleObject = new LitObject3D(testcubeVertices, testcubeIndices);
             exampleObject.UniqueName = "transparentCube";
             exampleObject.LitMaterial.DiffuseColor = new Vector4(0.5f, 0.7f, 0.6f, 0.5f);
+            exampleObject.MoveTo(0, 0, -3);
             SceneObjects.Add(exampleObject);
-            SceneObjects[SceneObjects.Count-1].MoveTo(0, 0, -3);
 
             // central cube at zero point. This one is hidden
             MeshConstructor3D.GetCubeMeshWithNormals(0.5f, out testcubeVertices, out testcubeIndices);
@@ -51,8 +51,8 @@ namespace HighLevelOpenTKRenderLib
             SimpleObject3D lightcube = new SimpleObject3D(testcubeVertices0, testcubeIndices0);
             lightcube.UniqueName = "lightCube";
             lightcube.IsShown = true;
+            lightcube.MoveTo(3.0f, 3.0f, 3.0f);
             SceneObjects.Add(lightcube);
-            SceneObjects[SceneObjects.Count - 1].MoveTo(3.0f, 3.0f, 3.0f);
 
             // main grid
             uint[] testgridIndices = new uint[] { };
@@ -73,8 +73,8 @@ namespace HighLevelOpenTKRenderLib
             sphericObject1.IsShown = true;
             sphericObject1.DrawTriangles = true;
             sphericObject1.LitMaterial.DiffuseColor = new Vector4(0.25f, 0.75f, 0.4f, 1.0f);
+            sphericObject1.MoveTo(0, 3.0f, -3.0f);
             SceneObjects.Add(sphericObject1);
-            SceneObjects[SceneObjects.Count - 1].MoveTo(0, 3.0f, -3.0f);
 
             // not smooth sphere
             uint[] testSphereIndices2 = new uint[] { };
@@ -85,8 +85,20 @@ namespace HighLevelOpenTKRenderLib
             sphericObject2.IsShown = true;
             sphericObject2.DrawTriangles = true;
             sphericObject2.LitMaterial.DiffuseColor = new Vector4(0.75f, 0.15f, 0.5f, 1.0f);
+            sphericObject2.MoveTo(-3.0f, 0f, -3f);
             SceneObjects.Add(sphericObject2);
-            SceneObjects[SceneObjects.Count - 1].MoveTo(-3.0f, 0f, -3f);
+
+            // not lit sphere
+            uint[] testSphereIndices3 = new uint[] { };
+            float[] testSphereVertices3 = new float[] { };
+            MeshConstructor3D.getSphereMesh(2.0f, out testSphereVertices3, out testSphereIndices3);
+            SimpleObject3D sphericObject3 = new SimpleObject3D(testSphereVertices3, testSphereIndices3);
+            sphericObject3.UniqueName = "sphere3";
+            sphericObject3.IsShown = true;
+            sphericObject3.DrawTriangles = true;
+            sphericObject3.SimpleColor = new Vector4(0.15f, 0.25f, 0.75f, 1.0f);
+            sphericObject3.MoveTo(1f, 1f, 1f);
+            SceneObjects.Add(sphericObject3);
         }
     }
 }

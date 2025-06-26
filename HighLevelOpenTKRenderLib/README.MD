@@ -12,7 +12,8 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
     - [ ] rotate object around specific point, 
 	- [x] translate object to distance, 
 	- [ ] mirror object over arbitrary mirroring plane. 
-- [ ] Predefined objects (:white_circle: cylinder, :white_check_mark: cube, :white_circle: sphere) and :white_circle: ability to setup my own object using vertices/indices/normals 
+- [ ] Predefined objects (:white_circle: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
+- [ ] ability to setup my own object using vertices/indices/normals 
 - [ ] Screen-space lines with ability to set up their thickness (:white_check_mark: by now it's a single-pixel wide line using opengl setting)
 - [ ] Also, ability to set up ambient lighting. 
 - [ ] Just simple lighting and light sources
