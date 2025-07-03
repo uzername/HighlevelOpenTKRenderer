@@ -63,6 +63,35 @@ namespace HighLevelOpenTKRenderLib
             simpleGrid.SimpleColor = new Vector4(0.75f, 0.75f, 0.75f,1.0f);
             simpleGrid.DrawTriangles = false;
             SceneObjects.Add(simpleGrid);
+            // shaded box
+            uint[] testBoxIndices = new uint[] { };
+            float[] testBoxVertices = new float[] { };
+            MeshConstructor3D.GetBoxMeshWithNormals(4.0f, 1.0f, 0.5f, out testBoxVertices, out testBoxIndices);
+            LitObject3D boxObject = new LitObject3D(testBoxVertices, testBoxIndices);
+            boxObject.UniqueName = "box1";
+            boxObject.IsShown = true;
+            boxObject.LitMaterial.DiffuseColor = new Vector4(1.0f, 0.0f, 0.05f, 1.0f);
+            boxObject.MoveTo(-1.0f, 0.0f, -5f);
+            SceneObjects.Add(boxObject);
+
+            // smoothed cylinder
+            uint[] testCylinderIndices = new uint[] { };
+            float[] testCylinderVertices = new float[] { };
+            MeshConstructor3D.GetCylinderMeshWithNormals(2.0f,3.0f, out testCylinderVertices, out testCylinderIndices, true);
+            LitObject3D cylObject = new LitObject3D(testCylinderVertices, testCylinderIndices);
+            cylObject.UniqueName = "cylinder1";
+            cylObject.IsShown = true;
+            cylObject.LitMaterial.DiffuseColor = new Vector4(0.1f, 0.2f, 1.0f, 1.0f);
+            cylObject.MoveTo(3.0f, 4.0f, -3f);
+            SceneObjects.Add(cylObject);
+            // not smoothed cylinder
+            MeshConstructor3D.GetCylinderMeshWithNormals(2.0f, 1.0f, out testCylinderVertices, out testCylinderIndices, false);
+            LitObject3D cylObject2 = new LitObject3D(testCylinderVertices, testCylinderIndices);
+            cylObject2.UniqueName = "cylinder2";
+            cylObject2.IsShown = true;
+            cylObject2.LitMaterial.DiffuseColor = new Vector4(0.1f, 0.85f, 0.45f, 1.0f);
+            cylObject2.MoveTo(-3.0f, 4.0f, -3f);
+            SceneObjects.Add(cylObject2);
 
             // smooth sphere
             uint[] testSphereIndices = new uint[] { };

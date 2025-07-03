@@ -164,7 +164,327 @@ namespace HighLevelOpenTKRenderLib
        20,21,22, 22,23,20
             };
         }
+        /// <summary>
+        /// get vertices and indices arrays for box mesh, with normals. Center of it lies in its geometrical center, in the very middle
+        /// </summary>
+        /// <param name="XDimSize">size in X direction</param>
+        /// <param name="YDimSize">size in Y direction</param>
+        /// <param name="ZDimSize">size in Z direction</param>
+        /// <param name="vertices">array of vertices with normals</param>
+        /// <param name="indices">array of indices</param>
+        public static void GetBoxMeshWithNormals(float XDimSize, float YDimSize, float ZDimSize, out float[] vertices, out uint[] indices)
+        {
+            // Half dimensions
+            float hx = XDimSize / 2f;
+            float hy = YDimSize / 2f;
+            float hz = ZDimSize / 2f;
+
+            // Each face has 4 vertices and 2 triangles (6 indices)
+            // Each vertex has 3 floats for position + 3 floats for normal = 6 floats
+
+            List<float> verts = new List<float>();
+            List<uint> inds = new List<uint>();
+            uint index = 0;
+
+            void AddFace(Vector3 normal, Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3)
+            {
+                void AddVertex(Vector3 pos)
+                {
+                    verts.Add(pos.X); verts.Add(pos.Y); verts.Add(pos.Z);
+                    verts.Add(normal.X); verts.Add(normal.Y); verts.Add(normal.Z);
+                }
+
+                AddVertex(v0);
+                AddVertex(v1);
+                AddVertex(v2);
+                AddVertex(v3);
+
+                // Triangle 1: v0, v1, v2
+                inds.Add(index);
+                inds.Add(index + 1);
+                inds.Add(index + 2);
+                // Triangle 2: v2, v3, v0
+                inds.Add(index + 2);
+                inds.Add(index + 3);
+                inds.Add(index);
+
+                index += 4;
+            }
+
+            // +Z Front face
+            AddFace(new Vector3(0, 0, 1),
+                new Vector3(-hx, -hy, hz),
+                new Vector3(hx, -hy, hz),
+                new Vector3(hx, hy, hz),
+                new Vector3(-hx, hy, hz));
+
+            // -Z Back face
+            AddFace(new Vector3(0, 0, -1),
+                new Vector3(hx, -hy, -hz),
+                new Vector3(-hx, -hy, -hz),
+                new Vector3(-hx, hy, -hz),
+                new Vector3(hx, hy, -hz));
+
+            // +X Right face
+            AddFace(new Vector3(1, 0, 0),
+                new Vector3(hx, -hy, hz),
+                new Vector3(hx, -hy, -hz),
+                new Vector3(hx, hy, -hz),
+                new Vector3(hx, hy, hz));
+
+            // -X Left face
+            AddFace(new Vector3(-1, 0, 0),
+                new Vector3(-hx, -hy, -hz),
+                new Vector3(-hx, -hy, hz),
+                new Vector3(-hx, hy, hz),
+                new Vector3(-hx, hy, -hz));
+
+            // +Y Top face
+            AddFace(new Vector3(0, 1, 0),
+                new Vector3(-hx, hy, hz),
+                new Vector3(hx, hy, hz),
+                new Vector3(hx, hy, -hz),
+                new Vector3(-hx, hy, -hz));
+
+            // -Y Bottom face
+            AddFace(new Vector3(0, -1, 0),
+                new Vector3(-hx, -hy, -hz),
+                new Vector3(hx, -hy, -hz),
+                new Vector3(hx, -hy, hz),
+                new Vector3(-hx, -hy, hz));
+
+            vertices = verts.ToArray();
+            indices = inds.ToArray();
+        }
         #endregion
+        public static void GetCylinderMeshWithNormals(float diameter, float height, out float[] vertices, out uint[] indices, bool isSmoothed)
+        {
+            const int segments = 36; // resolution of the circle
+            float radius = diameter / 2f;
+            float halfHeight = height / 2f;
+
+            List<float> verts = new List<float>();
+            List<uint> inds = new List<uint>();
+            uint index = 0;
+
+            // Helper method to add a vertex (position + normal)
+            void AddVertex(Vector3 pos, Vector3 normal)
+            {
+                verts.Add(pos.X); verts.Add(pos.Y); verts.Add(pos.Z);
+                verts.Add(normal.X); verts.Add(normal.Y); verts.Add(normal.Z);
+            }
+
+            // --- SIDE WALL ---
+            if (isSmoothed)
+            {
+                for (int i = 0; i <= segments; i++)
+                {
+                    float angle = i * MathF.PI * 2f / segments;
+                    float x = MathF.Cos(angle);
+                    float z = MathF.Sin(angle);
+                    Vector3 normal = new Vector3(x, 0, z);
+
+                    Vector3 top = new Vector3(x * radius, +halfHeight, z * radius);
+                    Vector3 bottom = new Vector3(x * radius, -halfHeight, z * radius);
+
+                    AddVertex(bottom, normal);
+                    AddVertex(top, normal);
+                }
+
+                for (int i = 0; i < segments; i++)
+                {
+                    inds.Add(index + (uint)(i * 2));
+                    inds.Add(index + (uint)(i * 2 + 1));
+                    inds.Add(index + (uint)(i * 2 + 3));
+
+                    inds.Add(index + (uint)(i * 2));
+                    inds.Add(index + (uint)(i * 2 + 3));
+                    inds.Add(index + (uint)(i * 2 + 2));
+                }
+
+                index += (uint)((segments + 1) * 2);
+            }
+            else
+            {
+                for (int i = 0; i < segments; i++)
+                {
+                    float angle1 = i * MathF.PI * 2f / segments;
+                    float angle2 = (i + 1) * MathF.PI * 2f / segments;
+
+                    float x1 = MathF.Cos(angle1), z1 = MathF.Sin(angle1);
+                    float x2 = MathF.Cos(angle2), z2 = MathF.Sin(angle2);
+
+                    Vector3 p0 = new Vector3(x1 * radius, -halfHeight, z1 * radius);
+                    Vector3 p1 = new Vector3(x1 * radius, +halfHeight, z1 * radius);
+                    Vector3 p2 = new Vector3(x2 * radius, +halfHeight, z2 * radius);
+                    Vector3 p3 = new Vector3(x2 * radius, -halfHeight, z2 * radius);
+
+                    Vector3 faceNormal = Vector3.Normalize(Vector3.Cross(p1 - p0, p3 - p0));
+
+                    AddVertex(p0, faceNormal);
+                    AddVertex(p1, faceNormal);
+                    AddVertex(p2, faceNormal);
+                    AddVertex(p3, faceNormal);
+
+                    inds.Add(index);
+                    inds.Add(index + 1);
+                    inds.Add(index + 2);
+                    inds.Add(index);
+                    inds.Add(index + 2);
+                    inds.Add(index + 3);
+
+                    index += 4;
+                }
+            }
+
+            // --- TOP CIRCLE ---
+            Vector3 topCenter = new Vector3(0, +halfHeight, 0);
+            AddVertex(topCenter, Vector3.UnitY);
+            uint topCenterIndex = index++;
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = i * MathF.PI * 2f / segments;
+                float x = MathF.Cos(angle);
+                float z = MathF.Sin(angle);
+                Vector3 pos = new Vector3(x * radius, +halfHeight, z * radius);
+                AddVertex(pos, Vector3.UnitY);
+
+                if (i > 0)
+                {
+                    inds.Add(topCenterIndex);
+                    inds.Add(topCenterIndex + (uint)i);
+                    inds.Add(topCenterIndex + (uint)i - 1);
+                }
+            }
+
+            index += (uint)(segments + 1);
+
+            // --- BOTTOM CIRCLE ---
+            Vector3 bottomCenter = new Vector3(0, -halfHeight, 0);
+            AddVertex(bottomCenter, -Vector3.UnitY);
+            uint bottomCenterIndex = index++;
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = i * MathF.PI * 2f / segments;
+                float x = MathF.Cos(angle);
+                float z = MathF.Sin(angle);
+                Vector3 pos = new Vector3(x * radius, -halfHeight, z * radius);
+                AddVertex(pos, -Vector3.UnitY);
+
+                if (i > 0)
+                {
+                    inds.Add(bottomCenterIndex);
+                    inds.Add(bottomCenterIndex + (uint)i - 1);
+                    inds.Add(bottomCenterIndex + (uint)i);
+                }
+            }
+
+            vertices = verts.ToArray();
+            indices = inds.ToArray();
+        }
+        /// <summary>
+        /// Gets a mesh and normals for a cone to use with phong shader. Bottom cap - Always rendered as a fan of triangles, flat-shaded with downward normal.
+        /// Coordinates: Base of the cone is centered at(0, -height/2), top is at(0, +height/2).
+        /// </summary>
+        /// <param name="diameter">diameter of bottom cap</param>
+        /// <param name="height"> total height of cone </param>
+        /// <param name="vertices"></param>
+        /// <param name="indices"></param>
+        /// <param name="isSmoothed"> isSmoothed=true : Normals are averaged to produce a smooth side surface. </param>
+        public static void GetConeMeshWithNormals(float diameter, float height, out float[] vertices, out uint[] indices, bool isSmoothed)
+        {
+            const int segments = 36;
+            float radius = diameter / 2f;
+            float halfHeight = height / 2f;
+
+            List<float> verts = new List<float>();
+            List<uint> inds = new List<uint>();
+            uint index = 0;
+
+            Vector3 apex = new Vector3(0, halfHeight, 0);
+
+            void AddVertex(Vector3 pos, Vector3 normal)
+            {
+                verts.Add(pos.X); verts.Add(pos.Y); verts.Add(pos.Z);
+                verts.Add(normal.X); verts.Add(normal.Y); verts.Add(normal.Z);
+            }
+
+            // --- Side Wall ---
+            if (isSmoothed)
+            {
+                for (int i = 0; i <= segments; i++)
+                {
+                    float angle = i * MathF.PI * 2f / segments;
+                    float x = MathF.Cos(angle);
+                    float z = MathF.Sin(angle);
+
+                    Vector3 point = new Vector3(x * radius, -halfHeight, z * radius);
+                    Vector3 toApex = Vector3.Normalize(apex - point);
+                    Vector3 tangent = Vector3.Normalize(new Vector3(-z, 0, x)); // perpendicular on XZ circle
+                    Vector3 normal = Vector3.Normalize(Vector3.Cross(tangent, toApex)); // normal lies between point and apex
+
+                    AddVertex(point, normal);
+                    AddVertex(apex, normal);
+                }
+
+                for (int i = 0; i < segments; i++)
+                {
+                    inds.Add(index + (uint)(i * 2));
+                    inds.Add(index + (uint)(i * 2 + 1));
+                    inds.Add(index + (uint)(i * 2 + 3));
+                }
+
+                index += (uint)((segments + 1) * 2);
+            }
+            else
+            {
+                for (int i = 0; i < segments; i++)
+                {
+                    float angle1 = i * MathF.PI * 2f / segments;
+                    float angle2 = (i + 1) * MathF.PI * 2f / segments;
+
+                    Vector3 p1 = new Vector3(MathF.Cos(angle1) * radius, -halfHeight, MathF.Sin(angle1) * radius);
+                    Vector3 p2 = new Vector3(MathF.Cos(angle2) * radius, -halfHeight, MathF.Sin(angle2) * radius);
+
+                    Vector3 faceNormal = Vector3.Normalize(Vector3.Cross(p2 - apex, p1 - apex));
+
+                    AddVertex(p1, faceNormal);
+                    AddVertex(p2, faceNormal);
+                    AddVertex(apex, faceNormal);
+
+                    inds.Add(index);
+                    inds.Add(index + 1);
+                    inds.Add(index + 2);
+
+                    index += 3;
+                }
+            }
+
+            // --- Bottom Cap ---
+            Vector3 bottomCenter = new Vector3(0, -halfHeight, 0);
+            AddVertex(bottomCenter, -Vector3.UnitY);
+            uint centerIndex = index++;
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = i * MathF.PI * 2f / segments;
+                float x = MathF.Cos(angle);
+                float z = MathF.Sin(angle);
+
+                Vector3 pos = new Vector3(x * radius, -halfHeight, z * radius);
+                AddVertex(pos, -Vector3.UnitY);
+
+                if (i > 0)
+                {
+                    inds.Add(centerIndex);
+                    inds.Add(centerIndex + (uint)i);
+                    inds.Add(centerIndex + (uint)i - 1);
+                }
+            }
+
+            vertices = verts.ToArray();
+            indices = inds.ToArray();
+        }
         #region Mesh generator  Sphere
         /// <summary>
         /// generate sphere with center in 0;0 with specified diameter and level of detail, include normals for rendering as a lit shape.

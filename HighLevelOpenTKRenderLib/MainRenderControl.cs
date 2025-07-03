@@ -225,7 +225,7 @@ namespace HighLevelOpenTKRenderLib
             //  Draw scene here. I cannot move selection of shaders and setting uniforms to their appropriate Draw() method because
             //  they use camera and light source which is related to scene
             
-            // Render opaque objects
+            // Render not transparent objects
             GL.Disable(EnableCap.Blend);
             renderOpaqueObjects();
 

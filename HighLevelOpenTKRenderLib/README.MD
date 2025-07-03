@@ -10,9 +10,9 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
 - [ ] grouping of objects on scene should be implemented too, so when one object moves, parent objects should move with it.
 - [ ] Math and transforms ( OpenTK already contains matrix calculations, those methods are to extend ) : 
     - [ ] rotate object around specific point, 
-	- [x] translate object to distance, 
-	- [ ] mirror object over arbitrary mirroring plane. 
-- [ ] Predefined objects (:white_circle: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
+    - [x] translate object to distance, 
+    - [ ] mirror object over arbitrary mirroring plane. 
+- [x] Predefined objects (:white_check_mark: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
 - [ ] ability to setup my own object using vertices/indices/normals 
 - [ ] Screen-space lines with ability to set up their thickness (:white_check_mark: by now it's a single-pixel wide line using opengl setting)
 - [ ] Also, ability to set up ambient lighting. 
