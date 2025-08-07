@@ -75,6 +75,20 @@ namespace HighLevelOpenTKRenderLib
             gridVertices = vertices.ToArray();
             gridIndices = indices.ToArray();
         }
+        public static void GetSingleLineMesh(in float xStart, in float yStart, in float zStart, in float xEnd, in float yEnd, in float zEnd, out float[] lineVertices, out uint[] lineIndices)
+        {
+            List<float> vertices = new List<float>();
+            List<uint> indices = new List<uint>();
+
+            vertices.Add(xStart); vertices.Add(yStart); vertices.Add(zStart);
+            vertices.Add(xEnd); vertices.Add(yEnd); vertices.Add(zEnd);
+
+            indices.Add(0);
+            indices.Add(1);
+
+            lineVertices = vertices.ToArray();
+            lineIndices = indices.ToArray();
+        }
         #region Mesh generator  Cube
         public static void GetCubeMesh(in float size, out float[] cubeVertices, out uint[] cubeIndices)
         {

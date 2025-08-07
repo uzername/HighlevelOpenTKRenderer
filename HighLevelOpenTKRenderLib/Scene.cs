@@ -63,6 +63,17 @@ namespace HighLevelOpenTKRenderLib
             simpleGrid.SimpleColor = new Vector4(0.75f, 0.75f, 0.75f,1.0f);
             simpleGrid.DrawTriangles = false;
             SceneObjects.Add(simpleGrid);
+
+            //line of fixed width
+            uint[] testLineIndices = new uint[] { };
+            float[] testLineVertices = new float[] { };
+            MeshConstructor3D.GetSingleLineMesh(10f, 0f, 0f, 5f, 10f, 5f, out testLineVertices, out testLineIndices);
+            ThickLineObject3D thickLine = new ThickLineObject3D(testLineVertices, testLineIndices);
+            thickLine.UniqueName = "thickLine1";
+            thickLine.SimpleColor = new Vector4(0.95f, 0.3f, 0.05f, 1.0f);
+            thickLine.DrawTriangles = false;
+            SceneObjects.Add(thickLine);
+
             // shaded box
             uint[] testBoxIndices = new uint[] { };
             float[] testBoxVertices = new float[] { };

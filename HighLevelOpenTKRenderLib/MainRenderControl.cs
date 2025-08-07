@@ -26,6 +26,7 @@ namespace HighLevelOpenTKRenderLib
         private Shader backgroundShader;
         private Shader simpleobjectShader;
         private Shader phongobjectShader;
+        private Shader thicklineobjectShader;
 
         private int vaoBackground;
 
@@ -79,6 +80,15 @@ namespace HighLevelOpenTKRenderLib
                 TextReader textReadVert = new StreamReader(streamphongvert);
                 TextReader textReadFrag = new StreamReader(streamphongfrag);
                 phongobjectShader = new Shader(textReadVert, textReadFrag);
+            }
+            using (var streamthicklinevert = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.thick_line.vert"))
+            using (var streamthicklinefrag = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.thick_line.frag"))
+            using (var streamthicklinegeom = Assembly.GetExecutingAssembly().GetManifestResourceStream("HighLevelOpenTKRenderLib.Shaders.thick_line.geom"))
+            {
+                TextReader textReadVert = new StreamReader(streamthicklinevert);
+                TextReader textReadFrag = new StreamReader(streamthicklinefrag);
+                TextReader textReadGeom = new StreamReader(streamthicklinegeom);
+                thicklineobjectShader = new Shader (textReadVert, textReadFrag, textReadGeom);
             }
             CurrentScene = new Scene();
             //CurrentScene.camera = new OrbitingCamera(new Vector3(0, 0, 0), 5.0f, (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);

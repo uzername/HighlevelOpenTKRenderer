@@ -139,7 +139,58 @@ namespace HighLevelOpenTKRenderLib.Common
                 _uniformLocations.Add(key, location);
             }
         }
+        /// <summary>
+        /// this constructor accepts streams. It is good when we use Resources. It is for screen-space lines that use geometry shader
+        /// </summary>
+        /// <param name="vertPath">text stream for vertex shader file</param>
+        /// <param name="fragPath">text stream for fragment shader</param>
+        /// <param name="geomPath">text stream for geometry shader</param>
+        public Shader(TextReader vertPath, TextReader fragPath, TextReader geomPath)
+        {
+            var shaderSourceVert = vertPath.ReadToEnd();
+            var shaderSourceFrag = fragPath.ReadToEnd();
+            var shaderSourceGeom = geomPath.ReadToEnd();
+            if (!shaderSourceVert.Contains("gl_Position"))
+                Debug.WriteLine("Warning: vertex shader source might be incorrect.");
 
+            if (!shaderSourceFrag.Contains("FragColor") && !shaderSourceFrag.Contains("gl_FragColor"))
+                Debug.WriteLine("Warning: fragment shader source might be incorrect.");
+
+            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
+            GL.ShaderSource(vertexShader, shaderSourceVert);
+            CompileShader(vertexShader);
+
+            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+            GL.ShaderSource(fragmentShader, shaderSourceFrag);
+            CompileShader(fragmentShader);
+
+            var geometryShader = GL.CreateShader(ShaderType.GeometryShader);
+            GL.ShaderSource(geometryShader, shaderSourceGeom);
+            CompileShader(geometryShader);
+
+            Handle = GL.CreateProgram();
+            GL.AttachShader(Handle, vertexShader);
+            GL.AttachShader(Handle, fragmentShader);
+            GL.AttachShader(Handle, geometryShader);
+
+            LinkProgram(Handle);
+
+            GL.DetachShader(Handle, vertexShader);
+            GL.DetachShader(Handle, fragmentShader);
+            GL.DetachShader(Handle, geometryShader);
+            GL.DeleteShader(fragmentShader);
+            GL.DeleteShader(vertexShader);
+            GL.DeleteShader(geometryShader);
+
+            GL.GetProgram(Handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
+            _uniformLocations = new Dictionary<string, int>();
+            for (var i = 0; i < numberOfUniforms; i++)
+            {
+                var key = GL.GetActiveUniform(Handle, i, out _, out _);
+                var location = GL.GetUniformLocation(Handle, key);
+                _uniformLocations.Add(key, location);
+            }
+        }
         private static void CompileShader(int shader)
         {
             // Try to compile the shader

@@ -14,7 +14,8 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
     - [ ] mirror object over arbitrary mirroring plane. 
 - [x] Predefined objects (:white_check_mark: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
 - [ ] ability to setup my own object using vertices/indices/normals 
-- [ ] Screen-space lines with ability to set up their thickness (:white_check_mark: by now it's a single-pixel wide line using opengl setting)
+- [ ] Screen-space lines with ability to set up their thickness (:white_check_mark: by now it's a single-pixel wide line using opengl setting). 
+Those are World-space lines with screen-space thickness. These lines: Exist in 3D world space, like any mesh; Are correctly affected by camera perspective and occlusion; Appear with constant screen-space width (e.g., always 2px or 5px wide), even when close or far.
 - [ ] Also, ability to set up ambient lighting. 
 - [ ] Just simple lighting and light sources
 - [x] Predefined Phong shaders and materials (uhh shaders). Ability to set specularity and color. No shadows needed.

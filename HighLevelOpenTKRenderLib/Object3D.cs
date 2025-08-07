@@ -110,6 +110,13 @@ namespace HighLevelOpenTKRenderLib
         }
     }
 
+    public class ThickLineObject3D : SimpleObject3D
+    {
+        public ThickLineObject3D(float[] vertices, uint[] indices) : base(vertices, indices)
+        {
+        }
+    }
+
     public class LitObject3D : Object3D
     {
         public Material LitMaterial = new Material();
