@@ -146,6 +146,27 @@ namespace HighLevelOpenTKRenderLib
         {
             void prepareRenderObj(Object3D obj)
             {
+                if (obj is ThickLineObject3D)
+                {
+                    thicklineobjectShader.Use();
+
+                    var view = CurrentScene.camera.GetViewMatrix();
+                    var projection = CurrentScene.camera.GetProjectionMatrix();
+
+                    GL.UniformMatrix4(thicklineobjectShader.GetUniformLocation("uModel"), false, ref obj.Transform);
+                    GL.UniformMatrix4(thicklineobjectShader.GetUniformLocation("uView"), false, ref view);
+                    GL.UniformMatrix4(thicklineobjectShader.GetUniformLocation("uProjection"), false, ref projection);
+
+                    // support color
+                    GL.Uniform4(thicklineobjectShader.GetUniformLocation("uColor"), (obj as ThickLineObject3D).SimpleColor);
+
+                    // support thickness
+                    GL.Uniform1(thicklineobjectShader.GetUniformLocation("uThickness"), (obj as ThickLineObject3D).thicknessLine);
+                    // transfer the dimensions of display
+                    double hght = glControlMain.ClientSize.Height;
+                    double wdth = glControlMain.ClientSize.Width;
+                    GL.Uniform2(thicklineobjectShader.GetUniformLocation("uViewportSize"), wdth, hght);
+                } else
                 if (obj is SimpleObject3D)
                 {
                     simpleobjectShader.Use();
@@ -183,7 +204,7 @@ namespace HighLevelOpenTKRenderLib
             {
                 foreach (var objjj in CurrentScene.SceneObjects)
                 {
-                    if (((objjj is SimpleObject3D) || ((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1))&& objjj.IsShown)
+                    if (((objjj is SimpleObject3D) || objjj is ThickLineObject3D || ((objjj is LitObject3D) && (objjj as LitObject3D).LitMaterial.DiffuseColor[3] == 1))&& objjj.IsShown)
                     {
                         prepareRenderObj(objjj);
                         objjj.Draw();

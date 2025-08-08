@@ -112,8 +112,18 @@ namespace HighLevelOpenTKRenderLib
 
     public class ThickLineObject3D : SimpleObject3D
     {
+        /// <summary>
+        /// thickness of line in pixels
+        /// </summary>
+        public float thicknessLine;
         public ThickLineObject3D(float[] vertices, uint[] indices) : base(vertices, indices)
         {
+        }
+        public override void Draw()
+        {
+            GL.BindVertexArray(Vao);
+            GL.DrawElements(PrimitiveType.Lines, indicesCount, DrawElementsType.UnsignedInt, 0);
+            GL.BindVertexArray(0);
         }
     }
 

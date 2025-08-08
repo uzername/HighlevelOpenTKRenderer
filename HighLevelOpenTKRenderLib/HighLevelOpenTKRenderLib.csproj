@@ -15,9 +15,8 @@
     <None Remove="Shaders\phong.frag" />
     <None Remove="Shaders\phong.vert" />
 
-    <None Remove="Shaders\thick_line.frag"/>
-    <None Remove="Shaders\thick_line.vert"/>
-    <None Remove="Shaders\thick_line.geom"/>
+    <None Remove="Shaders\thick_line.frag" />
+    <None Remove="Shaders\thick_line.vert" />
   </ItemGroup>
 
   <ItemGroup>

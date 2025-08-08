@@ -182,6 +182,12 @@ namespace HighLevelOpenTKRenderLib.Common
             GL.DeleteShader(vertexShader);
             GL.DeleteShader(geometryShader);
 
+            int status;
+            GL.GetProgram(this.Handle, GetProgramParameterName.LinkStatus, out status);
+            
+                string log = GL.GetProgramInfoLog(this.Handle);
+                Debug.WriteLine("Shader linking log: " + log);
+
             GL.GetProgram(Handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
             _uniformLocations = new Dictionary<string, int>();
             for (var i = 0; i < numberOfUniforms; i++)

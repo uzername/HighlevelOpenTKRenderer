@@ -1,0 +1,23 @@
+﻿#version 330 core
+// Geometry shader accepts lines and emits triangle_strip. Such move makes line look not 1px wide but as much px wide as you need
+// geometry shader. good for world-space lines with screen space thickness.
+// This method ensures lines appear the same width no matter how far the camera is.
+layout(lines) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+uniform mat4 uProjection;
+uniform mat4 uView;
+uniform mat4 uModel;
+
+// uThickness is the line width in pixels (e.g. 2.0, 4.0).
+uniform float uThickness; // in pixels
+// uViewportSize must be set manually on each frame (e.g. (800, 600))
+uniform vec2 uViewportSize; // viewport size in pixels
+
+void main() {
+    gl_Position = vec4(-1.0, -1.0, 0.0, 1.0); EmitVertex();
+    gl_Position = vec4( 1.0, -1.0, 0.0, 1.0); EmitVertex();
+    gl_Position = vec4(-1.0,  1.0, 0.0, 1.0); EmitVertex();
+    gl_Position = vec4( 1.0,  1.0, 0.0, 1.0); EmitVertex();
+    EndPrimitive();
+}
