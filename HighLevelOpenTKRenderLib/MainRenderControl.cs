@@ -161,11 +161,11 @@ namespace HighLevelOpenTKRenderLib
                     GL.Uniform4(thicklineobjectShader.GetUniformLocation("uColor"), (obj as ThickLineObject3D).SimpleColor);
 
                     // support thickness
-                    GL.Uniform1(thicklineobjectShader.GetUniformLocation("uThickness"), (obj as ThickLineObject3D).thicknessLine);
+                    thicklineobjectShader.SetFloat("uThickness", (obj as ThickLineObject3D).thicknessLine);
                     // transfer the dimensions of display
                     double hght = glControlMain.ClientSize.Height;
                     double wdth = glControlMain.ClientSize.Width;
-                    GL.Uniform2(thicklineobjectShader.GetUniformLocation("uViewportSize"), wdth, hght);
+                    thicklineobjectShader.SetVector2("uViewportSize", new Vector2((float) wdth, (float) hght));
                 } else
                 if (obj is SimpleObject3D)
                 {

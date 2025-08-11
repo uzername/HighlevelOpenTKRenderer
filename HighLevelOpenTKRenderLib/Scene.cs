@@ -70,7 +70,7 @@ namespace HighLevelOpenTKRenderLib
             MeshConstructor3D.GetSingleLineMesh(10f, 0f, 0f, 5f, 10f, 5f, out testLineVertices, out testLineIndices);
             ThickLineObject3D thickLine = new ThickLineObject3D(testLineVertices, testLineIndices);
             thickLine.UniqueName = "thickLine1";
-            thickLine.thicknessLine = 10.0f;
+            thickLine.thicknessLine = 5.0f;
             thickLine.SimpleColor = new Vector4(0.95f, 0.3f, 0.05f, 1.0f);
             thickLine.DrawTriangles = false;
             SceneObjects.Add(thickLine);
