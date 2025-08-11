@@ -14,8 +14,9 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
     - [ ] mirror object over arbitrary mirroring plane. 
 - [x] Predefined objects (:white_check_mark: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
 - [ ] ability to setup my own object using vertices/indices/normals 
-- [ ] Screen-space lines with ability to set up their thickness (:white_check_mark: by now it's a single-pixel wide line using opengl setting). 
+- [x] Screen-space lines with ability to set up their thickness (:white_check_mark:There is also a single-pixel wide line using opengl setting). 
 Those are World-space lines with screen-space thickness. These lines: Exist in 3D world space, like any mesh; Are correctly affected by camera perspective and occlusion; Appear with constant screen-space width (e.g., always 2px or 5px wide), even when close or far.
+(sort of works now, but there is always space for improvement. It uses geometry shader)
 - [ ] Also, ability to set up ambient lighting. 
 - [ ] Just simple lighting and light sources
 - [x] Predefined Phong shaders and materials (uhh shaders). Ability to set specularity and color. No shadows needed.
@@ -26,17 +27,19 @@ Those are World-space lines with screen-space thickness. These lines: Exist in 3
 
 #### Implementation
 
-ChatGPT helps me a lot with this project
+ChatGPT helps me a lot with this project, this project won't be possible without its aid.
 
 I'd like to build a solution around OpenTK Winforms control v 4.0 , using modern OpenGL with shaders and buffers (not instant mode). There may be such entities that implement such description:
 - MainRenderControl that contains OpenTK winforms control instance, an entry point of library
-- CameraMk2 - base class for camera, parent for FreeMoveCamera and OrbitingCamera. Orthogonal and perspective camera setting (I assume it should not really be a separate class for it, it is just about mode of matrix calculation.
+- CameraMk2 - base class for camera, parent for FreeMoveCamera and OrbitingCamera. Orthogonal and perspective camera setting (I assume it should not really be a separate class for it, it is just about mode of matrix calculation). Call `SetPerspectiveCamera(bool isPerspectiveCamera)` to toggle between camera modes, no need to re-create camera. By the way, size of object on display does not change when Orthogonal camera is moved closer or further - mathematically correct Orthogonal camera behavior.
     - ICameraControl - control scheme of camera
       - FirstPersonCamera
       - OrbitingCamera
 - Object3D - generic object for items on scene. it contains transformations in matrix form. Also it has vertices and indices
-    - SimpleObject3D - Object3D that ignores lighting on rendering
-    - LitObject3D - uses Phong shader and requires normals for rendering
+    - SimpleObject3D - Object3D that ignores lighting on rendering. Uses `basic.frag` shader to simply convey a solid color of object upon rendering. Uses `basic.vert` to compute matrices - model, view and projection that show object on 3D scene according to camera
+    - LitObject3D - uses Phong shader and requires normals for rendering, uses two shaders `phong.frag` - fragment shader that calculates color of lit object. Also it uses transparency. `phong.vert` - performs matrix calculations of model, view and projection 
+    - ThickLineObject3D - uses `thick_line.geom` (geometry shader that gives 4 coordinates for a quad to OpenGL conveyor from 2 line coordinates), `thick_line.frag` (fragment shader, similar as in simple object 3d), `thick_line.vert` (it makes line to look in scene). 
+      Both types of line - with arbitrary width and single-pixel default one - are drawn using method `GL.DrawElements(PrimitiveType.Lines, indicesCount, DrawElementsType.UnsignedInt, 0);`
 - MeshConstructor3D - utility class to construct vertices and indices for cylinder, cube, sphere
 - Scene - collection of objects. While rendering inside MainRenderControl, a cycle runs over this collection to show object3d . It should have methods to remove object from scene, add created and set up Object3D to scene.
 - Light - OpenGL has no concept of light, it is just a setting of shader. But for scene logic it is important to have light as object that can be translated around. 
