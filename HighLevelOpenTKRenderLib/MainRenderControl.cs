@@ -14,7 +14,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace HighLevelOpenTKRenderLib
@@ -22,6 +21,11 @@ namespace HighLevelOpenTKRenderLib
     public partial class MainRenderControl : UserControl
     {
         public Scene CurrentScene;
+        public bool ProcessOnClick;
+        /// <summary>
+        /// object has been picked on scene - event triggered from OnClick
+        /// </summary>
+        public event EventHandler<String?> onObjectPicked;
 
         private Shader backgroundShader;
         private Shader simpleobjectShader;
@@ -35,14 +39,20 @@ namespace HighLevelOpenTKRenderLib
             InitializeComponent();
 
             // Hook up event handlers
+            /* render code */
             glControlMain.Paint += glControlMain_Paint;
+            /* re-process aspect ratio */
             glControlMain.Resize += glControlMain_Resize;
+            /* init */
             glControlMain.Load += glControlMain_Load;
+            /* move further or closer with mouse scroll. Or change field of view for Orthogonal camera */
             glControlMain.MouseWheel += OnEvent_MouseWheel;
-
+            glControlMain.MouseDown += glControlMain_MouseDown;
             // Set up continuous rendering
             Application.Idle += Application_Idle;
         }
+
+
 
         private bool initialized = false;
         private void glControlMain_Load(object sender, EventArgs e)
@@ -320,15 +330,29 @@ namespace HighLevelOpenTKRenderLib
 
         private void glControlMain_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
+            // mouse was moved while right button is held
+            if (e.Button == MouseButtons.Right)   {
                 CurrentScene.camera.ProcessMouseInputLook(e.X, e.Y);
             }
         }
 
         private void glControlMain_MouseDown(object sender, MouseEventArgs e)
         {
-
+            if (e.Button != MouseButtons.Left) return;
+            int mouseX = e.X;    int mouseY = e.Y;
+            int viewportHeight = glControlMain.ClientSize.Height;
+            int viewportWidth = glControlMain.ClientSize.Width;
+            /*
+             mouse coordinates in OpenGL space
+             WinForms mouse events give e.X, e.Y in window client pixels from the top-left. OpenGL’s NDC space is different:
+             Origin (0,0) is center of screen. X ranges from -1 (left) to +1 (right). Y ranges from -1 (bottom) to +1 (top).
+            so at first lets count Normalized Device coordinates
+             */
+            float ndcX = (2.0f * mouseX) / viewportWidth - 1.0f;
+            float ndcY = 1.0f - (2.0f * mouseY) / viewportHeight; // flip Y, in Winforms it is top to bottom - in Opengl it is bottom to top
+            /* From NDC to a clip-space position */
+            Vector4 clipNear = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
+            Vector4 clipFar = new Vector4(ndcX, ndcY, 1.0f, 1.0f);
         }
 
         private void glControlMain_MouseUp(object sender, MouseEventArgs e)
