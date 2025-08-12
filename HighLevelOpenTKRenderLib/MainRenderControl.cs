@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -21,11 +22,11 @@ namespace HighLevelOpenTKRenderLib
     public partial class MainRenderControl : UserControl
     {
         public Scene CurrentScene;
-        public bool ProcessOnClick;
+        public bool performPicking;
         /// <summary>
         /// object has been picked on scene - event triggered from OnClick
         /// </summary>
-        public event EventHandler<String?> onObjectPicked;
+        public event Action<String?> onObjectPicked;
 
         private Shader backgroundShader;
         private Shader simpleobjectShader;
@@ -47,7 +48,6 @@ namespace HighLevelOpenTKRenderLib
             glControlMain.Load += glControlMain_Load;
             /* move further or closer with mouse scroll. Or change field of view for Orthogonal camera */
             glControlMain.MouseWheel += OnEvent_MouseWheel;
-            glControlMain.MouseDown += glControlMain_MouseDown;
             // Set up continuous rendering
             Application.Idle += Application_Idle;
         }
@@ -338,21 +338,27 @@ namespace HighLevelOpenTKRenderLib
 
         private void glControlMain_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButtons.Left) return;
+            this.Focus();
+            if ((performPicking == false)|| (e.Button != MouseButtons.Left)) return;
             int mouseX = e.X;    int mouseY = e.Y;
             int viewportHeight = glControlMain.ClientSize.Height;
             int viewportWidth = glControlMain.ClientSize.Width;
-            /*
-             mouse coordinates in OpenGL space
-             WinForms mouse events give e.X, e.Y in window client pixels from the top-left. OpenGL’s NDC space is different:
-             Origin (0,0) is center of screen. X ranges from -1 (left) to +1 (right). Y ranges from -1 (bottom) to +1 (top).
-            so at first lets count Normalized Device coordinates
-             */
-            float ndcX = (2.0f * mouseX) / viewportWidth - 1.0f;
-            float ndcY = 1.0f - (2.0f * mouseY) / viewportHeight; // flip Y, in Winforms it is top to bottom - in Opengl it is bottom to top
-            /* From NDC to a clip-space position */
-            Vector4 clipNear = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
-            Vector4 clipFar = new Vector4(ndcX, ndcY, 1.0f, 1.0f);
+
+            var proj = CurrentScene.camera.GetProjectionMatrix();
+            var view = CurrentScene.camera.GetViewMatrix();
+            var camPos = CurrentScene.camera.Position;
+            Vector3 origin = new Vector3(); Vector3 dir = new Vector3();
+            if (CurrentScene.camera.isPerspective)  {
+                var (origin0, dir0) = Picking.ScreenPointToRay(e.X, e.Y, viewportWidth, viewportHeight, proj, view, camPos);
+                origin = origin0; dir = dir0;
+            } else
+            {
+                var (origin0, dir0) = Picking.ScreenPointToRayOrtho(e.X, e.Y, viewportWidth, viewportHeight, proj, view, camPos);
+                origin = origin0; dir = dir0;
+            }
+                // Do intersection tests with your scene (bounding boxes, triangles, etc.)
+                onObjectPicked?.Invoke($"Ray origin={origin}, dir={dir}");
+
         }
 
         private void glControlMain_MouseUp(object sender, MouseEventArgs e)

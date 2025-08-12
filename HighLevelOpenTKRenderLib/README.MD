@@ -12,9 +12,9 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
     - [ ] rotate object around specific point, 
     - [x] translate object to distance, 
     - [ ] mirror object over arbitrary mirroring plane. 
-- [x] Predefined objects (:white_check_mark: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
+- [x] Predefined objects ( :white_check_mark: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
 - [ ] ability to setup my own object using vertices/indices/normals 
-- [x] Screen-space lines with ability to set up their thickness (:white_check_mark:There is also a single-pixel wide line using opengl setting). 
+- [x] Screen-space lines with ability to set up their thickness ( :heavy_check_mark: There is also a single-pixel wide line using opengl setting ). 
 Those are World-space lines with screen-space thickness. These lines: Exist in 3D world space, like any mesh; Are correctly affected by camera perspective and occlusion; Appear with constant screen-space width (e.g., always 2px or 5px wide), even when close or far.
 (sort of works now, but there is always space for improvement. It uses geometry shader)
 - [ ] Also, ability to set up ambient lighting. 
@@ -22,7 +22,7 @@ Those are World-space lines with screen-space thickness. These lines: Exist in 3
 - [x] Predefined Phong shaders and materials (uhh shaders). Ability to set specularity and color. No shadows needed.
 - [x] transparency shaders too, with appropriate z-layering, no raytracing and physical lighting needed, it's for engineering.   
 - [x] Gradient background of scene is ok 
-- [ ] Picking items on scene with mouse 
+- [ ] Picking items on scene with mouse ( :heavy_check_mark: now I can get a vector and starting point. Next I need to calculate collision of obtained vector with Axis Aligned Bound Box, as for rough pick direction. Then I need to perform more fine picking processing with obtained rough picking results )
 - [ ] Screen-space cube (like in Inventor or Sketchup or Maya) to quickly set desired view of camera, or axis lines (like in Blender 3D)
 
 #### Implementation
