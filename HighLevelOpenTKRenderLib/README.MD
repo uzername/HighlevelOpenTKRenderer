@@ -8,10 +8,11 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
 	- [x] Orthogonal and perspective camera setting. 
 	- [ ] fit all objects on scene into view, without thinking about matrix transformations. (this one corresponds to scene actually)
 - [ ] grouping of objects on scene should be implemented too, so when one object moves, parent objects should move with it.
-- [ ] Math and transforms ( OpenTK already contains matrix calculations, those methods are to extend ) : 
-    - [ ] rotate object around specific point, 
+- [x] Math and transforms ( OpenTK already contains matrix calculations, those methods are to extend ) : 
+    - [x] rotate object around specific ~~point~~ ~~vector~~ axis, 
     - [x] translate object to distance, 
-    - [ ] mirror object over arbitrary mirroring plane. 
+    - [x] mirror object over coordinate mirroring plane. 
+    - [x] mirror object over arbitrary plane.
 - [x] Predefined objects ( :white_check_mark: cylinder, :white_check_mark: cube, :white_check_mark: sphere and :white_circle: rectangular prism) 
 - [ ] ability to setup my own object using vertices/indices/normals 
 - [x] Screen-space lines with ability to set up their thickness ( :heavy_check_mark: There is also a single-pixel wide line using opengl setting ). 
@@ -35,11 +36,12 @@ I'd like to build a solution around OpenTK Winforms control v 4.0 , using modern
     - ICameraControl - control scheme of camera
       - FirstPersonCamera
       - OrbitingCamera
-- Object3D - generic object for items on scene. it contains transformations in matrix form. Also it has vertices and indices
+- Object3D - generic object for items on scene. it contains transformations in matrix form. Also it has vertices and indices. It keeps Vertices list and may provide bound box if needed
     - SimpleObject3D - Object3D that ignores lighting on rendering. Uses `basic.frag` shader to simply convey a solid color of object upon rendering. Uses `basic.vert` to compute matrices - model, view and projection that show object on 3D scene according to camera
     - LitObject3D - uses Phong shader and requires normals for rendering, uses two shaders `phong.frag` - fragment shader that calculates color of lit object. Also it uses transparency. `phong.vert` - performs matrix calculations of model, view and projection 
     - ThickLineObject3D - uses `thick_line.geom` (geometry shader that gives 4 coordinates for a quad to OpenGL conveyor from 2 line coordinates), `thick_line.frag` (fragment shader, similar as in simple object 3d), `thick_line.vert` (it makes line to look in scene). 
+      It shares a lot in common with SimpleObject3D
       Both types of line - with arbitrary width and single-pixel default one - are drawn using method `GL.DrawElements(PrimitiveType.Lines, indicesCount, DrawElementsType.UnsignedInt, 0);`
-- MeshConstructor3D - utility class to construct vertices and indices for cylinder, cube, sphere
+- MeshConstructor3D - utility class to construct vertices and indices for cylinder, cube, sphere. It also has insight how to make your own object 
 - Scene - collection of objects. While rendering inside MainRenderControl, a cycle runs over this collection to show object3d . It should have methods to remove object from scene, add created and set up Object3D to scene.
 - Light - OpenGL has no concept of light, it is just a setting of shader. But for scene logic it is important to have light as object that can be translated around. 
