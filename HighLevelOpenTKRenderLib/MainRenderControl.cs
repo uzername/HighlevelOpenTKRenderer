@@ -103,7 +103,7 @@ namespace HighLevelOpenTKRenderLib
             CurrentScene = new Scene();
             //CurrentScene.camera = new OrbitingCamera(new Vector3(0, 0, 0), 5.0f, (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
             CurrentScene.camera = new FirstPersonCamera(new Vector3(0, 0, 5), (float)glControlMain.ClientSize.Width / glControlMain.ClientSize.Height, 60);
-            CurrentScene.AddTestObject2();
+            // CurrentScene.AddTestObject2();
             CurrentScene.SceneLights.Add(new Light { Color = new Vector3(1, 1, 1), Position = new Vector3(3, 3, 3) });
 
             glControlMain.TabStop = true;

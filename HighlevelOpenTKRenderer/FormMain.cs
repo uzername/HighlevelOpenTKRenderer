@@ -14,6 +14,14 @@ namespace HighlevelOpenTKRenderer
             this.tableLayoutPanelMain.Controls.Add(renderControl, 0, 0);
             renderControl.onObjectPicked += RenderControl_onObjectPicked;
             renderControl.performPicking = true;
+            // cannot add objects here to scene, need to wait OpenGL initialization
+            // but when Render Control is initialized then I may add test objects . renderControl already has OnLoad handler hooked, but I hook another one so they run in sequence
+            renderControl.Load += RenderControl_Load;
+        }
+
+        private void RenderControl_Load(object? sender, EventArgs e)
+        {
+            SceneTest.AddTestObject2(renderControl.CurrentScene);
         }
 
         private void RenderControl_onObjectPicked(string? obj)

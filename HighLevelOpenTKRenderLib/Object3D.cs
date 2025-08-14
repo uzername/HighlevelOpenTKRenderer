@@ -174,9 +174,9 @@ namespace HighLevelOpenTKRenderLib
         /// <summary>
         /// create reflection matrix around a plane defined by 3 points
         /// </summary>
-        /// <param name="point1"></param>
-        /// <param name="point2"></param>
-        /// <param name="point3"></param>
+        /// <param name="point1">point on plane</param>
+        /// <param name="point2">point on plane</param>
+        /// <param name="point3">point on plane</param>
         /// <returns></returns>
         public static Matrix4 CreateReflection(Vector3 point1, Vector3 point2, Vector3 point3)
         {
@@ -209,6 +209,9 @@ namespace HighLevelOpenTKRenderLib
     /// </summary>
     public class SimpleObject3D: Object3D
     {
+        /// <summary>
+        /// a simple color in which to show object - red green blue and alpha components, in range of 0 to 1 preferably. Alpha is not used though, keep it as 1.
+        /// </summary>
         public Vector4 SimpleColor = new Vector4(1.0f,1.0f,1.0f,1.0f);
         public SimpleObject3D(float[] vertices, uint[] indices)
         {
@@ -256,7 +259,10 @@ namespace HighLevelOpenTKRenderLib
                 GL.BindVertexArray(0);
         }
     }
-
+    /// <summary>
+    /// Scene object that shows like a line for which you may specify thickness and which does show same thick on screen.
+    /// It is subclassed from SimpleObject3D because it does not use Phong lighting and looks modest and plain
+    /// </summary>
     public class ThickLineObject3D : SimpleObject3D
     {
         /// <summary>
@@ -273,7 +279,9 @@ namespace HighLevelOpenTKRenderLib
             GL.BindVertexArray(0);
         }
     }
-
+    /// <summary>
+    /// 3D object on scene that is rendered as lit by light sources. Uses Phong shader
+    /// </summary>
     public class LitObject3D : Object3D
     {
         public Material LitMaterial = new Material();
@@ -306,6 +314,11 @@ namespace HighLevelOpenTKRenderLib
 
             assignVertices(vertexData);
         }
+        /// <summary>
+        /// usually called in constructor. It saves array of numbers (which contains coordinates and normals - for each coordinate) into List of coordinates
+        /// </summary>
+        /// <param name="verticesData">array of float numbers: three numbers for coordinate followed by three numbers for normal - and this is for each coordinate</param>
+        /// <exception cref="ArgumentException"></exception>
         public override void assignVertices(float[] verticesData)
         {
             // don't forget to skip normals every 3 coordinates
@@ -316,6 +329,9 @@ namespace HighLevelOpenTKRenderLib
                 Vertices.Add(new Vector3(verticesData[i], verticesData[i + 1], verticesData[i + 2]));
             }
         }
+        /// <summary>
+        /// that's how you draw the item. It may be shown as solid shape or as sleek one pixel lines, depending on DrawTriangles
+        /// </summary>
         public override void Draw()
         {
             GL.BindVertexArray(Vao);

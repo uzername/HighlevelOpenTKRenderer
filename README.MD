@@ -12,4 +12,4 @@ I think that Opentk (Opengl) control for WinForms may be useful, because WPF 3D 
 - Picking items on scene with mouse 
 - Screen-space cube (like in Inventor or Sketchup or Maya) to quickly set desired view of camera, or axis lines (like in Blender 3D)
 
-![screenshot](picture1208.png)
+![screenshot](picture1208.PNG)
